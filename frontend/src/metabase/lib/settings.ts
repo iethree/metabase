@@ -5,7 +5,11 @@ import moment from "moment-timezone";
 import { parseTimestamp } from "metabase/lib/time";
 import MetabaseUtils from "metabase/lib/utils";
 
-import { PasswordComplexity, SettingKey, Settings } from "metabase-types/api";
+import type {
+  PasswordComplexity,
+  SettingKey,
+  Settings,
+} from "metabase-types/api";
 
 const n2w = (n: number) => MetabaseUtils.numberToWord(n);
 

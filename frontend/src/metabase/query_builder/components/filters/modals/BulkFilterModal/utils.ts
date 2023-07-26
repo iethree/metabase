@@ -1,9 +1,13 @@
-import StructuredQuery, {
+/* eslint-disable import/no-duplicates */
+import type StructuredQuery from "metabase-lib/queries/StructuredQuery";
+import { isDimensionOption } from "metabase-lib/queries/StructuredQuery";
+import type {
   DimensionOption,
   SegmentOption,
   FilterSection,
-  isDimensionOption,
 } from "metabase-lib/queries/StructuredQuery";
+/* eslint-enable import/no-duplicates */
+
 import type Filter from "metabase-lib/queries/structured/Filter";
 
 // fix between filters with missing or misordered arguments

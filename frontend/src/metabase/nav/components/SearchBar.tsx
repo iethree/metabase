@@ -1,8 +1,9 @@
-import { MouseEvent, useEffect, useCallback, useRef, useState } from "react";
+import type { MouseEvent } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import { t } from "ttag";
 import { push } from "react-router-redux";
 import { withRouter } from "react-router";
-import { Location, LocationDescriptorObject } from "history";
+import type { Location, LocationDescriptorObject } from "history";
 
 import { usePrevious } from "react-use";
 import { Icon } from "metabase/core/components/Icon";

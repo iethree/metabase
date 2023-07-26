@@ -1,7 +1,8 @@
 import { connect } from "react-redux";
 import { getSetting } from "metabase/selectors/settings";
-import { State } from "metabase-types/store";
-import DatabaseForm, { DatabaseFormProps } from "../../components/DatabaseForm";
+import type { State } from "metabase-types/store";
+import type { DatabaseFormProps } from "../../components/DatabaseForm";
+import DatabaseForm from "../../components/DatabaseForm";
 
 type DatabaseFormStateKeys = "engines" | "isHosted" | "isCachingEnabled";
 type DatabaseFormOwnProps = Omit<DatabaseFormProps, DatabaseFormStateKeys>;

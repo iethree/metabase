@@ -1,27 +1,21 @@
-import {
-  forwardRef,
-  HTMLAttributes,
-  ReactNode,
-  Ref,
-  useContext,
-  useMemo,
-} from "react";
-import * as React from "react";
+import { forwardRef, useContext, useMemo } from "react";
+import type * as React from "react";
 import { useUniqueId } from "metabase/hooks/use-unique-id";
-import { TabContext, TabContextType } from "../Tab";
+import type { TabContextType } from "../Tab";
+import { TabContext } from "../Tab";
 import { TabListContent, TabListRoot } from "./TabList.styled";
 
 export interface TabListProps<T>
-  extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   value?: T;
   onChange?: (value: T) => void;
   onScroll?: React.UIEventHandler<HTMLDivElement>;
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
 const TabList = forwardRef(function TabGroup<T>(
   { value, onChange, onScroll, children, ...props }: TabListProps<T>,
-  ref: Ref<HTMLDivElement>,
+  ref: React.Ref<HTMLDivElement>,
 ) {
   const idPrefix = useUniqueId();
   const outerContext = useContext(TabContext);

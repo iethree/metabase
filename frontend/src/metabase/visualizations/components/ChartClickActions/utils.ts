@@ -1,7 +1,9 @@
 import _ from "underscore";
 import { t } from "ttag";
-import type { RegularClickAction } from "metabase/modes/types";
-import { ClickActionSection } from "metabase/modes/types";
+import type {
+  RegularClickAction,
+  ClickActionSection,
+} from "metabase/modes/types";
 
 type Section = {
   icon: string;

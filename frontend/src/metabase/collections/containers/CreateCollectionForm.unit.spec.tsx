@@ -5,7 +5,7 @@ import { createMockEntitiesState } from "__support__/store";
 import { renderWithProviders, screen, waitFor } from "__support__/ui";
 import { setupEnterpriseTest } from "__support__/enterprise";
 
-import { Collection, User } from "metabase-types/api";
+import type { Collection, User } from "metabase-types/api";
 import { createMockCollection, createMockUser } from "metabase-types/api/mocks";
 
 import CreateCollectionForm from "./CreateCollectionForm";

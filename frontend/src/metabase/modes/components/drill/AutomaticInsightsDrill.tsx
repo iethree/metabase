@@ -3,8 +3,10 @@ import type {
   ClickActionBase,
   ClickActionProps,
   PopoverClickAction,
+  ClickActionPopoverProps,
+  UrlClickAction,
 } from "metabase/modes/types";
-import { ClickActionPopoverProps, UrlClickAction } from "metabase/modes/types";
+
 import MetabaseSettings from "metabase/lib/settings";
 import { ChartClickActionsView } from "metabase/visualizations/components/ChartClickActions";
 import {

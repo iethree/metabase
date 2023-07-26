@@ -1,10 +1,5 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-  HTMLAttributes,
-} from "react";
+import type { HTMLAttributes } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { t } from "ttag";
 import { useField } from "formik";
 
@@ -24,7 +19,7 @@ import { isValidCollectionId } from "metabase/collections/utils";
 
 import type { CollectionId } from "metabase-types/api";
 
-import { ButtonProps } from "metabase/core/components/Button";
+import type { ButtonProps } from "metabase/core/components/Button";
 import Tooltip from "metabase/core/components/Tooltip";
 import {
   PopoverItemPicker,

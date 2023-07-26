@@ -8,7 +8,7 @@ import FormFooter from "metabase/core/components/FormFooter";
 import FormSubmitButton from "metabase/core/components/FormSubmitButton";
 import FormErrorMessage from "metabase/core/components/FormErrorMessage";
 import { PLUGIN_CACHING } from "metabase/plugins";
-import { DatabaseData, Engine } from "metabase-types/api";
+import type { DatabaseData, Engine } from "metabase-types/api";
 import { getDefaultEngineKey } from "../../utils/engine";
 import {
   getSubmitValues,

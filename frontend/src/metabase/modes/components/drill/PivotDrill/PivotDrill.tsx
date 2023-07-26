@@ -6,17 +6,17 @@ import type {
   ClickActionProps,
   PopoverClickAction,
 } from "metabase/modes/types";
-import { Card } from "metabase-types/api";
+import type { Card } from "metabase-types/api";
 import { ChartClickActionsView } from "metabase/visualizations/components/ChartClickActions";
-import StructuredQuery from "metabase-lib/queries/StructuredQuery";
+import type StructuredQuery from "metabase-lib/queries/StructuredQuery";
+import type { PivotDrillResult } from "metabase-lib/queries/drills/pivot-drill";
 import {
   pivotByCategoryDrill,
   pivotByLocationDrill,
   pivotByTimeDrill,
-  PivotDrillResult,
 } from "metabase-lib/queries/drills/pivot-drill";
-import DimensionOptions from "metabase-lib/DimensionOptions";
-import { ClickObjectDimension } from "metabase-lib/queries/drills/types";
+import type DimensionOptions from "metabase-lib/DimensionOptions";
+import type { ClickObjectDimension } from "metabase-lib/queries/drills/types";
 import { StyledBreakoutPopover } from "../common/BreakoutPopover.styled";
 
 type PivotDrillTypesConfig = {

@@ -12,10 +12,11 @@ import type { Dashboard, Collection, CollectionId } from "metabase-types/api";
 import type { State } from "metabase-types/store";
 
 import CreateCollectionModal from "metabase/collections/containers/CreateCollectionModal";
-import CreateDashboardForm, {
+import type {
   CreateDashboardFormOwnProps,
   StagedDashboard,
 } from "./CreateDashboardForm";
+import CreateDashboardForm from "./CreateDashboardForm";
 
 interface CreateDashboardModalOwnProps
   extends Omit<CreateDashboardFormOwnProps, "onCancel"> {

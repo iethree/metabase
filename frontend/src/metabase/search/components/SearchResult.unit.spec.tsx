@@ -12,7 +12,7 @@ import {
 } from "metabase-types/api/mocks";
 import { getIcon, renderWithProviders, queryIcon } from "__support__/ui";
 
-import { InitialSyncStatus } from "metabase-types/api";
+import type { InitialSyncStatus } from "metabase-types/api";
 import type { WrappedResult } from "./types";
 import { SearchResult } from "./SearchResult";
 

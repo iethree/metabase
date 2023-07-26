@@ -1,7 +1,6 @@
-import { MouseEvent, ReactNode } from "react";
-import * as React from "react";
+import type * as React from "react";
 import Tooltip from "metabase/core/components/Tooltip";
-import { IconName } from "metabase/core/components/Icon";
+import type { IconName } from "metabase/core/components/Icon";
 import {
   MenuExternalLink,
   MenuItemContent,
@@ -13,7 +12,7 @@ import {
 export interface EntityMenuItemProps {
   title?: string;
   icon?: IconName;
-  action?: (event: MouseEvent<HTMLDivElement>) => void;
+  action?: (event: React.MouseEvent<HTMLDivElement>) => void;
   link?: string;
   externalLink?: boolean;
   tooltip?: React.ReactNode;
@@ -78,11 +77,11 @@ const EntityMenuItem = ({
 };
 
 interface ActionMenuItemProps {
-  action?: (event: MouseEvent<HTMLDivElement>) => void;
+  action?: (event: React.MouseEvent<HTMLDivElement>) => void;
   tooltip?: React.ReactNode;
   disabled?: boolean;
   event?: string;
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
 const ActionMenuItem = ({
@@ -102,10 +101,10 @@ const ActionMenuItem = ({
 interface LinkMenuItemProps {
   link: string;
   externalLink?: boolean;
-  tooltip?: ReactNode;
+  tooltip?: React.ReactNode;
   disabled?: boolean;
   event?: string;
-  children?: ReactNode;
+  children?: React.ReactNode;
   onClose?: () => void;
 }
 

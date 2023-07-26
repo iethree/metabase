@@ -1,10 +1,8 @@
-import { VisualizationSettings } from "metabase-types/api";
-import {
-  ChartColumns,
-  getChartColumns,
-} from "metabase/visualizations/lib/graph/columns";
-import { ColumnFormatter } from "metabase/visualizations/shared/types/format";
-import { TwoDimensionalChartData } from "../types/data";
+import type { VisualizationSettings } from "metabase-types/api";
+import type { ChartColumns } from "metabase/visualizations/lib/graph/columns";
+import { getChartColumns } from "metabase/visualizations/lib/graph/columns";
+import type { ColumnFormatter } from "metabase/visualizations/shared/types/format";
+import type { TwoDimensionalChartData } from "../types/data";
 import { getOrderedSeries, getSeries } from "./data";
 import { getSeriesColors } from "./colors";
 

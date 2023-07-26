@@ -8,7 +8,7 @@ import {
 } from "metabase-types/api/mocks/presets";
 import { createMockMetadata } from "__support__/metadata";
 import Mode from "metabase-lib/Mode";
-import { QueryMode } from "metabase-lib/queries/drills/types";
+import type { QueryMode } from "metabase-lib/queries/drills/types";
 import { ChartClickActionsView } from "./ChartClickActionsView";
 
 describe("ChartClickActionsView", () => {

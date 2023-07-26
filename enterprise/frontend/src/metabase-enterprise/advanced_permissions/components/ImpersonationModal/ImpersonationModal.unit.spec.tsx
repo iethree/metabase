@@ -18,7 +18,7 @@ import {
 } from "__support__/server-mocks/impersonation";
 import { createMockImpersonation } from "metabase-types/api/mocks/permissions";
 import { getImpersonations } from "metabase-enterprise/advanced_permissions/selectors";
-import { AdvancedPermissionsStoreState } from "metabase-enterprise/advanced_permissions/types";
+import type { AdvancedPermissionsStoreState } from "metabase-enterprise/advanced_permissions/types";
 
 const groupId = 2;
 const databaseId = 1;

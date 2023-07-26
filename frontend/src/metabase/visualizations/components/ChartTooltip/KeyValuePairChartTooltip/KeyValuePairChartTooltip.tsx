@@ -1,7 +1,7 @@
 import { isValidElement, useMemo } from "react";
 import { getFriendlyName } from "metabase/visualizations/lib/utils";
-import { RemappingHydratedDatasetColumn } from "metabase/visualizations/shared/types/data";
-import {
+import type { RemappingHydratedDatasetColumn } from "metabase/visualizations/shared/types/data";
+import type {
   DataPoint,
   HoveredDimension,
   HoveredObject,

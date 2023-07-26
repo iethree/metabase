@@ -1,5 +1,5 @@
-import { FormEvent, useState } from "react";
-import * as React from "react";
+import { useState } from "react";
+import type * as React from "react";
 import { jt, t } from "ttag";
 import { useAsync } from "react-use";
 
@@ -64,7 +64,7 @@ const DeleteDatabaseModal = ({
   const [databaseNameConfirmation, setDatabaseNameConfirmation] = useState("");
   const [error, setError] = useState<any>(null);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {

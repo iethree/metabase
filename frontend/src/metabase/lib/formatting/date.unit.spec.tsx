@@ -1,5 +1,5 @@
 import { formatDateTimeRangeWithUnit } from "metabase/lib/formatting/date";
-import { OptionsType } from "metabase/lib/formatting/types";
+import type { OptionsType } from "metabase/lib/formatting/types";
 
 describe("formatDateTimeRangeWithUnit", () => {
   const format = formatDateTimeRangeWithUnit;

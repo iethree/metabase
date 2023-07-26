@@ -1,5 +1,5 @@
-import { forwardRef, ReactNode, Ref, useCallback } from "react";
-import * as React from "react";
+import { forwardRef, useCallback } from "react";
+import type * as React from "react";
 import { useField } from "formik";
 import { useUniqueId } from "metabase/hooks/use-unique-id";
 import FormField from "metabase/core/components/FormField";
@@ -11,7 +11,7 @@ import CategoryFieldPicker from "./CategoryFieldPicker";
 export interface FormCategoryInputProps {
   name: string;
   title?: string;
-  description?: ReactNode;
+  description?: React.ReactNode;
   nullable?: boolean;
   className?: string;
   style?: React.CSSProperties;
@@ -28,7 +28,7 @@ const FormCategoryInput = forwardRef(function FormInput(
     nullable,
     field,
   }: FormCategoryInputProps,
-  ref: Ref<HTMLDivElement>,
+  ref: React.Ref<HTMLDivElement>,
 ) {
   const id = useUniqueId();
   const [{ value }, { error, touched }, { setValue }] = useField(name);

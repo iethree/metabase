@@ -14,10 +14,10 @@ import {
   isEntityName,
   isPK,
 } from "metabase-lib/types/utils/isa";
-import Question from "metabase-lib/Question";
-import Table from "metabase-lib/metadata/Table";
+import type Question from "metabase-lib/Question";
+import type Table from "metabase-lib/metadata/Table";
 
-import { ObjectId } from "./types";
+import type { ObjectId } from "./types";
 
 export interface GetObjectNameArgs {
   table?: Table | null;

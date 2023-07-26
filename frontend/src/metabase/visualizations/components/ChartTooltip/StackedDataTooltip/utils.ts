@@ -1,5 +1,5 @@
 import { t } from "ttag";
-import { TooltipRowModel } from "../types";
+import type { TooltipRowModel } from "../types";
 
 export const getTotalValue = (
   headerRows: TooltipRowModel[] = [],

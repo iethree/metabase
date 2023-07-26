@@ -2,8 +2,8 @@ import { t } from "ttag";
 import _ from "underscore";
 import Button from "metabase/core/components/Button";
 import Questions from "metabase/entities/questions";
-import { State } from "metabase-types/store";
-import Question from "metabase-lib/Question";
+import type { State } from "metabase-types/store";
+import type Question from "metabase-lib/Question";
 import StructuredQuery from "metabase-lib/queries/StructuredQuery";
 import {
   getQuestionIdFromVirtualTableId,

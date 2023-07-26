@@ -1,5 +1,5 @@
 import { css, Global } from "@emotion/react";
-import { FontFile } from "metabase-types/api";
+import type { FontFile } from "metabase-types/api";
 import { saveDomImageStyles } from "metabase/visualizations/lib/save-chart-image";
 
 export interface GlobalStylesProps {

@@ -1,6 +1,6 @@
 import { t } from "ttag";
 import { pluralize, singularize } from "metabase/lib/formatting/strings";
-import { Drill } from "metabase/modes/types";
+import type { Drill } from "metabase/modes/types";
 import {
   foreignKeyDrill,
   foreignKeyDrillQuestion,

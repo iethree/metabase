@@ -6,13 +6,13 @@ import {
   useCallback,
   useEffect,
 } from "react";
-import * as React from "react";
+import type * as React from "react";
 import { t } from "ttag";
 import cx from "classnames";
 import type { Location } from "history";
 
 import { getScrollY } from "metabase/lib/dom";
-import { Dashboard } from "metabase-types/api";
+import type { Dashboard } from "metabase-types/api";
 
 import EditBar from "metabase/components/EditBar";
 import HeaderModal from "metabase/components/HeaderModal";

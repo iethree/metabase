@@ -1,4 +1,4 @@
-import Question from "metabase-lib/Question";
+import type Question from "metabase-lib/Question";
 import Mode, { getModeType } from "metabase-lib/Mode";
 import {
   MODE_TYPE_NATIVE,

@@ -1,6 +1,10 @@
 /* istanbul ignore file */
 import { IndexRedirect, Route } from "react-router";
-import { SettingDefinition, Settings, TokenFeatures } from "metabase-types/api";
+import type {
+  SettingDefinition,
+  Settings,
+  TokenFeatures,
+} from "metabase-types/api";
 import {
   createMockSettings,
   createMockTokenFeatures,

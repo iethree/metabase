@@ -1,5 +1,9 @@
-import { DatasetData, Series, VisualizationSettings } from "metabase-types/api";
-import { IconName } from "metabase/core/components/Icon";
+import type {
+  DatasetData,
+  Series,
+  VisualizationSettings,
+} from "metabase-types/api";
+import type { IconName } from "metabase/core/components/Icon";
 
 export type Visualization = {
   uiName: string;

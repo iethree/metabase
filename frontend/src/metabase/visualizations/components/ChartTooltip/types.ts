@@ -1,6 +1,6 @@
-import { MouseEvent } from "react";
-import { TimelineEvent } from "metabase-types/api/timeline";
-import { RemappingHydratedDatasetColumn } from "metabase/visualizations/shared/types/data";
+import type { MouseEvent } from "react";
+import type { TimelineEvent } from "metabase-types/api/timeline";
+import type { RemappingHydratedDatasetColumn } from "metabase/visualizations/shared/types/data";
 
 export type VisualizationSettings = Record<string, unknown> & {
   column?: (

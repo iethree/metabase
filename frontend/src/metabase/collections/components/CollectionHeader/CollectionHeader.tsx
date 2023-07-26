@@ -1,7 +1,7 @@
 import { withRouter } from "react-router";
 import type { Location } from "history";
 
-import { Collection, CollectionId } from "metabase-types/api";
+import type { Collection, CollectionId } from "metabase-types/api";
 
 import CollectionCaption from "./CollectionCaption";
 import CollectionBookmark from "./CollectionBookmark";

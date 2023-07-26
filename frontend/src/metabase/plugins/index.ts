@@ -1,5 +1,4 @@
-import { HTMLAttributes } from "react";
-import * as React from "react";
+import type * as React from "react";
 import { t } from "ttag";
 
 import type { IconName, IconProps } from "metabase/core/components/Icon";
@@ -27,7 +26,7 @@ import type { AdminPathKey, State } from "metabase-types/store";
 import type Question from "metabase-lib/Question";
 
 import type Database from "metabase-lib/metadata/Database";
-import { GetAuthProviders, PluginGroupManagersType } from "./types";
+import type { GetAuthProviders, PluginGroupManagersType } from "./types";
 
 // functions called when the application is started
 export const PLUGIN_APP_INIT_FUCTIONS = [];
@@ -162,7 +161,7 @@ type CollectionAuthorityLevelIcon = React.ComponentType<
 >;
 
 type FormCollectionAuthorityLevelPicker = React.ComponentType<
-  HTMLAttributes<HTMLDivElement> & { name: string; title?: string }
+  React.HTMLAttributes<HTMLDivElement> & { name: string; title?: string }
 >;
 
 export const PLUGIN_COLLECTION_COMPONENTS = {

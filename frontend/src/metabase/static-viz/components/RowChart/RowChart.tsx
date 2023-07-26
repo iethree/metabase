@@ -11,9 +11,9 @@ import {
   trimData,
 } from "metabase/visualizations/shared/utils/data";
 import { getChartGoal } from "metabase/visualizations/lib/settings/goal";
-import { VisualizationSettings } from "metabase-types/api";
-import { ColorGetter } from "metabase/static-viz/lib/colors";
-import {
+import type { VisualizationSettings } from "metabase-types/api";
+import type { ColorGetter } from "metabase/static-viz/lib/colors";
+import type {
   RemappingHydratedChartData,
   TwoDimensionalChartData,
 } from "metabase/visualizations/shared/types/data";

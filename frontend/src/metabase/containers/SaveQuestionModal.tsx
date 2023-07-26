@@ -18,11 +18,11 @@ import Button from "metabase/core/components/Button";
 import FormSubmitButton from "metabase/core/components/FormSubmitButton";
 import FormRadio from "metabase/core/components/FormRadio";
 import { canonicalCollectionId } from "metabase/collections/utils";
-import { Collection, CollectionId } from "metabase-types/api";
+import type { Collection, CollectionId } from "metabase-types/api";
 import * as Errors from "metabase/core/utils/errors";
 import { getIsSavedQuestionChanged } from "metabase/query_builder/selectors";
 import { useSelector } from "metabase/lib/redux";
-import Question from "metabase-lib/Question";
+import type Question from "metabase-lib/Question";
 
 import "./SaveQuestionModal.css";
 

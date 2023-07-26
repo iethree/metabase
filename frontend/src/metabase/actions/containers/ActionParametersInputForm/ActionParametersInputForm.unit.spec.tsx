@@ -14,12 +14,10 @@ import {
   createMockDashboard,
 } from "metabase-types/api/mocks";
 
-import ActionParametersInputForm, {
-  ActionParametersInputFormProps,
-} from "./ActionParametersInputForm";
-import ActionParametersInputModal, {
-  ActionParametersInputModalProps,
-} from "./ActionParametersInputModal";
+import type { ActionParametersInputFormProps } from "./ActionParametersInputForm";
+import ActionParametersInputForm from "./ActionParametersInputForm";
+import type { ActionParametersInputModalProps } from "./ActionParametersInputModal";
+import ActionParametersInputModal from "./ActionParametersInputModal";
 
 const parameter1 = createMockActionParameter({
   id: "parameter_1",
