@@ -212,7 +212,7 @@ jobs:
           TERM: xterm
 
       - name: Run slow and resource-intensive Cypress tests
-        if: matrix.runner != 'ubuntu-22.04'
+        if: matrix.runner != 'ubuntu-22.04' && github.event_name != 'schedule'
         run: |
           yarn run test-cypress-run \
           --env grepTags="@slow" \
@@ -222,10 +222,10 @@ jobs:
           TERM: xterm
 
       - name: Run EE Cypress tests on ${{ matrix.folder }}
-        if: matrix.edition == 'ee' && github.event_name != 'schedule'
+        if: matrix.edition == 'ee' && github.event_name != 'schedule' && matrix.context != grep
         run: |
           yarn run test-cypress-run \
-          --env grepTags="-@quarantine" \
+          --env grepTags="-@slow --@quarantine" \
           --folder ${{ matrix.folder }} \
           --browser ${{ steps.setup-chrome.outputs.chrome-path }}
         env:
@@ -253,7 +253,7 @@ jobs:
         if: matrix.edition == 'ee' && github.event_name == 'schedule'
         run: |
           yarn run test-cypress-run \
-          --env grepTags="-@quarantine" \
+          --env grepTags="-@slow --@quarantine" \
           --folder ${{ matrix.folder }} \
           --browser "replay-chromium"
         env:
