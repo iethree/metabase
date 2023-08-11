@@ -40,7 +40,7 @@ import {
 
 const { PRODUCTS } = SAMPLE_DATABASE;
 
-describe("scenarios > models", () => {
+describe("scenarios > models", { tags: "@slow" }, () => {
   beforeEach(() => {
     restore();
     cy.signInAsAdmin();

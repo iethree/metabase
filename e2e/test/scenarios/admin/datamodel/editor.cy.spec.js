@@ -26,7 +26,7 @@ const ORDERS_DESCRIPTION =
 const CUSTOM_MAPPING_ERROR =
   "You need unrestricted data access on this table to map custom display values.";
 
-describe("scenarios > admin > datamodel > editor", () => {
+describe("scenarios > admin > datamodel > editor", { tags: "@slow" }, () => {
   beforeEach(() => {
     cy.intercept("GET", "/api/database/*/schema/*").as("fetchTables");
     cy.intercept("GET", "/api/table/*/query_metadata*").as("fetchMetadata");

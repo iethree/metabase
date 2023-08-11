@@ -20,7 +20,7 @@ const PERMISSIONS = {
   no: ["nocollection", "nosql", "none"],
 };
 
-describe("collection permissions", () => {
+describe("collection permissions", { tags: "@slow" }, () => {
   beforeEach(() => {
     restore();
   });

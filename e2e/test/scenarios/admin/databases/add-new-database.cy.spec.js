@@ -10,7 +10,7 @@ import {
   QA_POSTGRES_PORT,
 } from "e2e/support/cypress_data";
 
-describe("admin > database > add", () => {
+describe("admin > database > add", { tags: "@slow" }, () => {
   beforeEach(() => {
     restore();
     cy.signInAsAdmin();

@@ -70,7 +70,7 @@ const aggregatedQuestionDetails = {
   },
 };
 
-describe("scenarios > filters > bulk filtering", () => {
+describe("scenarios > filters > bulk filtering", { tags: "@slow" }, () => {
   beforeEach(() => {
     restore();
     cy.signInAsAdmin();
