@@ -222,7 +222,7 @@ jobs:
           TERM: xterm
 
       - name: Run EE Cypress tests on ${{ matrix.folder }}
-        if: matrix.edition == 'ee' && github.event_name != 'schedule' && matrix.context != grep
+        if: matrix.edition == 'ee' && github.event_name != 'schedule' && matrix.context != 'grep'
         run: |
           yarn run test-cypress-run \
           --env grepTags="-@slow --@quarantine" \
