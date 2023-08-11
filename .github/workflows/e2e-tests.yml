@@ -88,6 +88,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        runner: [ubuntu-22.04]
         java-version: [11]
         edition: [ee]
         folder:
@@ -114,8 +115,13 @@ jobs:
           - "visualizations"
         include:
           - edition: oss
+            runner: ubuntu-22.04
             context: grep
             java-version: 11
+          - edition: ee
+            java-version: 11
+            context: grep
+            runner: buildjet-2vcpu-ubuntu-2204
     services:
       maildev:
         image: maildev/maildev:2.0.5
@@ -200,6 +206,16 @@ jobs:
         run: |
           yarn run test-cypress-run \
           --env grepTags=@OSS \
+          --spec './e2e/test/scenarios/**/*.cy.spec.js' \
+          --browser ${{ steps.setup-chrome.outputs.chrome-path }}
+        env:
+          TERM: xterm
+
+      - name: Run slow and resource-intensive Cypress tests
+        if: matrix.runner != 'ubuntu-22.04'
+        run: |
+          yarn run test-cypress-run \
+          --env grepTags="@slow" \
           --spec './e2e/test/scenarios/**/*.cy.spec.js' \
           --browser ${{ steps.setup-chrome.outputs.chrome-path }}
         env:
@@ -302,6 +318,10 @@ jobs:
           - edition: oss
             context: grep
             java-version: 11
+          - edition: ee
+            java-version: 11
+            context: grep
+            runner: buildjet-2vcpu-ubuntu-2204
     steps:
       - run: |
           echo "Didn't run due to conditional filtering"
