@@ -205,7 +205,7 @@ jobs:
         if: matrix.edition == 'oss' && github.event_name != 'schedule'
         run: |
           yarn run test-cypress-run \
-          --env grepTags=@OSS \
+          --env grepTags=@OSS,grepOmitFiltered=true \
           --spec './e2e/test/scenarios/**/*.cy.spec.js' \
           --browser ${{ steps.setup-chrome.outputs.chrome-path }}
         env:
@@ -215,7 +215,7 @@ jobs:
         if: matrix.runner != 'ubuntu-22.04' && github.event_name != 'schedule'
         run: |
           yarn run test-cypress-run \
-          --env grepTags="@slow" \
+          --env grepTags="@slow",grepOmitFiltered=true \
           --spec './e2e/test/scenarios/**/*.cy.spec.js' \
           --browser ${{ steps.setup-chrome.outputs.chrome-path }}
         env:
@@ -225,7 +225,7 @@ jobs:
         if: matrix.edition == 'ee' && github.event_name != 'schedule' && matrix.context != 'grep'
         run: |
           yarn run test-cypress-run \
-          --env grepTags="-@slow --@quarantine" \
+          --env grepTags="-@slow --@quarantine",grepOmitFiltered=true \
           --folder ${{ matrix.folder }} \
           --browser ${{ steps.setup-chrome.outputs.chrome-path }}
         env:
@@ -240,7 +240,7 @@ jobs:
         if: matrix.edition == 'oss' && github.event_name == 'schedule'
         run: |
           yarn run test-cypress-run \
-          --env grepTags=@OSS \
+          --env grepTags=@OSS,grepOmitFiltered=true \
           --spec './e2e/test/scenarios/**/*.cy.spec.js' \
           --browser "replay-chromium"
         env:
@@ -253,7 +253,7 @@ jobs:
         if: matrix.edition == 'ee' && github.event_name == 'schedule'
         run: |
           yarn run test-cypress-run \
-          --env grepTags="-@slow --@quarantine" \
+          --env grepTags="-@slow --@quarantine,grepOmitFiltered=true \
           --folder ${{ matrix.folder }} \
           --browser "replay-chromium"
         env:
