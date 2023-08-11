@@ -121,7 +121,7 @@ jobs:
           - edition: ee
             java-version: 11
             context: grep
-            runner: ubuntu-22.04-4-cores
+            runner: ubuntu-22.04-8-cores
     services:
       maildev:
         image: maildev/maildev:2.0.5
