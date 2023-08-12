@@ -41,7 +41,7 @@ jobs:
   build:
     needs: files-changed
     if: github.event.pull_request.draft == false && needs.files-changed.outputs.e2e_all == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04-8-cores
     timeout-minutes: 25
     strategy:
       matrix:
@@ -88,7 +88,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ubuntu-22.04]
+        runner: [ubuntu-22.04-4-cores]
         java-version: [11]
         edition: [ee]
         folder:
@@ -121,7 +121,7 @@ jobs:
           - edition: ee
             java-version: 11
             context: grep
-            runner: ubuntu-22.04-4-cores
+            runner: ubuntu-22.04-8-cores
     services:
       maildev:
         image: maildev/maildev:2.0.5
