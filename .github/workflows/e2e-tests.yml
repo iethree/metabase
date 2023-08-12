@@ -116,11 +116,11 @@ jobs:
         include:
           - edition: oss
             runner: ubuntu-22.04
-            context: grep
+            context: oss-subset
             java-version: 11
           - edition: ee
             java-version: 11
-            context: grep
+            context: slow
             runner: ubuntu-22.04-8-cores
     services:
       maildev:
@@ -212,7 +212,7 @@ jobs:
           TERM: xterm
 
       - name: Run slow and resource-intensive Cypress tests
-        if: matrix.runner != 'ubuntu-22.04' && github.event_name != 'schedule'
+        if: matrix.context == 'slow' && github.event_name != 'schedule'
         run: |
           yarn run test-cypress-run \
           --env grepTags="@slow",grepOmitFiltered=true \
@@ -222,7 +222,7 @@ jobs:
           TERM: xterm
 
       - name: Run EE Cypress tests on ${{ matrix.folder }}
-        if: matrix.edition == 'ee' && github.event_name != 'schedule' && matrix.context != 'grep'
+        if: matrix.edition == 'ee' && github.event_name != 'schedule' && matrix.context != 'slow'
         run: |
           yarn run test-cypress-run \
           --env grepTags="-@slow --@quarantine",grepOmitFiltered=true \
@@ -250,7 +250,7 @@ jobs:
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.test-run-id.outputs.testRunId }}
 
       - name: Run EE Cypress tests on ${{ matrix.folder }} using Replay.io browser
-        if: matrix.edition == 'ee' && github.event_name == 'schedule'
+        if: matrix.edition == 'ee' && github.event_name == 'schedule' && matrix.context != 'slow'
         run: |
           yarn run test-cypress-run \
           --env grepTags="-@slow --@quarantine,grepOmitFiltered=true \
