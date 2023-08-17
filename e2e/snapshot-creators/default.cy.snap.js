@@ -205,6 +205,13 @@ describe("snapshots", () => {
       },
       display: "line",
     });
+
+    // Model 1
+    cy.createQuestion({
+      name: "Orders Model",
+      query: { "source-table": ORDERS_ID },
+      dataset: true,
+    });
   }
 
   function ensureTableIdsAreCorrect({
