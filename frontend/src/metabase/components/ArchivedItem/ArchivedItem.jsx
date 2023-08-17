@@ -10,6 +10,18 @@ import Tooltip from "metabase/core/components/Tooltip";
 import { color as c } from "metabase/lib/colors";
 import { ActionIcon, ItemIcon, ItemIconContainer } from "./ArchivedItem.styled";
 
+const defaultIcon = ({ icon, color }) => (
+  <ItemIconContainer>
+    <ItemIcon name={icon} color={color} />
+  </ItemIconContainer>
+);
+
+const swappedIcon = ({ selected, onToggleSelected }) => (
+  <ItemIconContainer>
+    <CheckBox checked={selected} onChange={onToggleSelected} />
+  </ItemIconContainer>
+);
+
 const ArchivedItem = ({
   name,
   type,
@@ -21,21 +33,18 @@ const ArchivedItem = ({
   selected,
   onToggleSelected,
   showSelect,
+  readOnly = false,
 }) => (
   <div
     className="flex align-center p2 hover-parent hover--visibility border-bottom bg-light-hover"
     data-testid={`archive-item-${name}`}
   >
     <Swapper
-      defaultElement={
-        <ItemIconContainer>
-          <ItemIcon name={icon} color={color} />
-        </ItemIconContainer>
-      }
+      defaultElement={defaultIcon({ icon, color })}
       swappedElement={
-        <ItemIconContainer>
-          <CheckBox checked={selected} onChange={onToggleSelected} />
-        </ItemIconContainer>
+        readOnly
+          ? defaultIcon({ icon, color })
+          : swappedIcon({ selected, onToggleSelected })
       }
       isSwapped={showSelect}
     />
@@ -77,6 +86,7 @@ ArchivedItem.propTypes = {
   selected: PropTypes.bool.isRequired,
   onToggleSelected: PropTypes.func.isRequired,
   showSelect: PropTypes.bool.isRequired,
+  readOnly: PropTypes.bool.isRequired,
 };
 
 export default ArchivedItem;

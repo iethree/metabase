@@ -1,9 +1,12 @@
 /* eslint-disable react/prop-types */
-import { Component } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { usePrevious } from "react-use";
 import { connect } from "react-redux";
 import { t } from "ttag";
 import _ from "underscore";
 
+import { useListSelect } from "metabase/hooks/use-list-select";
+import { getCollectionsById } from "metabase/selectors/collection";
 import Button from "metabase/core/components/Button";
 import BulkActionBar from "metabase/components/BulkActionBar";
 import Card from "metabase/components/Card";
@@ -12,7 +15,6 @@ import StackedCheckBox from "metabase/components/StackedCheckBox";
 import VirtualizedList from "metabase/components/VirtualizedList";
 
 import Search from "metabase/entities/search";
-import listSelect from "metabase/hoc/ListSelect";
 
 import { getIsNavbarOpen, openNavbar } from "metabase/redux/app";
 import { getUserIsAdmin } from "metabase/selectors/user";
@@ -28,9 +30,11 @@ import {
   ArchiveRoot,
 } from "./ArchiveApp.styled";
 
+// ! CONVERT THESE TO SELECTORS
 const mapStateToProps = (state, props) => ({
   isNavbarOpen: getIsNavbarOpen(state),
   isAdmin: getUserIsAdmin(state, props),
+  collectionsById: getCollectionsById(state),
 });
 
 const mapDispatchToProps = {
@@ -39,94 +43,107 @@ const mapDispatchToProps = {
 
 const ROW_HEIGHT = 68;
 
-class ArchiveApp extends Component {
-  constructor(props) {
-    super(props);
-    this.mainElement = getMainElement();
-  }
-
-  componentDidMount() {
+function ArchiveApp({ collectionsById, isAdmin, isNavbarOpen, list, reload }) {
+  useEffect(() => {
     if (!isSmallScreen()) {
-      this.props.openNavbar();
+      openNavbar();
     }
-  }
+  }, []);
 
-  render() {
-    const {
-      isAdmin,
-      isNavbarOpen,
-      list,
-      reload,
+  const [itemList, setItemList] = useState([]);
+  const { selected, toggleItem, toggleAll, getIsSelected, clear } =
+    useListSelect(item => `${item.model}:${item.id}`);
 
-      selected,
-      selection,
-      onToggleSelected,
-    } = this.props;
-    return (
-      <ArchiveRoot>
-        <ArchiveHeader>
-          <PageHeading>{t`Archive`}</PageHeading>
-        </ArchiveHeader>
-        <ArchiveBody>
-          <Card
-            style={{
-              height: list.length > 0 ? ROW_HEIGHT * list.length : "auto",
-            }}
-          >
-            {list.length > 0 ? (
-              <VirtualizedList
-                scrollElement={this.mainElement}
-                items={list}
-                rowHeight={ROW_HEIGHT}
-                renderItem={({ item }) => (
-                  <ArchivedItem
-                    type={item.type}
-                    name={item.getName()}
-                    icon={item.getIcon().name}
-                    color={item.getColor()}
-                    isAdmin={isAdmin}
-                    onUnarchive={
-                      item.setArchived
-                        ? async () => {
-                            await item.setArchived(false);
-                            reload();
-                          }
-                        : null
-                    }
-                    onDelete={
-                      item.delete
-                        ? async () => {
-                            await item.delete();
-                            reload();
-                          }
-                        : null
-                    }
-                    selected={selection.has(item)}
-                    onToggleSelected={() => onToggleSelected(item)}
-                    showSelect={selected.length > 0}
-                  />
-                )}
-              />
-            ) : (
-              <ArchiveEmptyState>
-                <h2>{t`Items you archive will appear here.`}</h2>
-              </ArchiveEmptyState>
-            )}
-          </Card>
-        </ArchiveBody>
-        <BulkActionBar
-          isNavbarOpen={isNavbarOpen}
-          showing={selected.length > 0}
-        >
-          <ArchiveBarContent>
-            <SelectionControls {...this.props} />
-            <BulkActionControls {...this.props} />
-            <ArchiveBarText>{t`${selected.length} items selected`}</ArchiveBarText>
-          </ArchiveBarContent>
-        </BulkActionBar>
-      </ArchiveRoot>
+  const prevList = usePrevious(list);
+  useEffect(() => {
+    if (_.isEqual(prevList, list)) {
+      return;
+    }
+
+    setItemList(
+      list.map(item => ({
+        item,
+        readOnly: !collectionsById?.[item.getCollection().id]?.can_write,
+      })),
     );
-  }
+  }, [collectionsById, list, prevList]);
+
+  const mainElement = useMemo(() => getMainElement(), []);
+
+  return (
+    <ArchiveRoot>
+      <ArchiveHeader>
+        <PageHeading>{t`Archive`}</PageHeading>
+      </ArchiveHeader>
+      <ArchiveBody>
+        <Card
+          style={{
+            height: itemList.length > 0 ? ROW_HEIGHT * itemList.length : "auto",
+          }}
+        >
+          {itemList.length > 0 ? (
+            <VirtualizedList
+              scrollElement={mainElement}
+              items={itemList}
+              rowHeight={ROW_HEIGHT}
+              renderItem={({ item: { item, readOnly } }) => (
+                <ArchivedItem
+                  type={item.type}
+                  name={item.getName()}
+                  icon={item.getIcon().name}
+                  color={item.getColor()}
+                  isAdmin={isAdmin}
+                  onUnarchive={
+                    item.setArchived
+                      ? async () => {
+                          await item.setArchived(false);
+                          reload();
+                        }
+                      : null
+                  }
+                  onDelete={
+                    item.delete
+                      ? async () => {
+                          await item.delete();
+                          reload();
+                        }
+                      : null
+                  }
+                  selected={getIsSelected(item)}
+                  onToggleSelected={() => toggleItem(item)}
+                  showSelect={selected.length > 0}
+                  readOnly={readOnly}
+                />
+              )}
+            />
+          ) : (
+            <ArchiveEmptyState>
+              <h2>{t`Items you archive will appear here.`}</h2>
+            </ArchiveEmptyState>
+          )}
+        </Card>
+      </ArchiveBody>
+      <BulkActionBar isNavbarOpen={isNavbarOpen} showing={selected.length > 0}>
+        <ArchiveBarContent>
+          <SelectionControls
+            allSelected={
+              selected.length ===
+              itemList.filter(({ readOnly }) => !readOnly).length
+            }
+            toggleAll={() => {
+              const unselected = itemList
+                .map(({ item }) => item)
+                .filter(item => !getIsSelected(item));
+              toggleAll(unselected);
+            }}
+            clear={clear}
+          />
+          <BulkActionControls selected={selected} reload={reload} />
+          <ArchiveBarText>{t`${selected.length} items selected`}</ArchiveBarText>
+        </ArchiveBarContent>
+      </BulkActionBar>
+    </ArchiveRoot>
+  );
 }
 
 export default _.compose(
@@ -135,7 +152,6 @@ export default _.compose(
     reload: true,
     wrapped: true,
   }),
-  listSelect({ keyForItem: item => `${item.model}:${item.id}` }),
   connect(mapStateToProps, mapDispatchToProps),
 )(ArchiveApp);
 
@@ -168,9 +184,9 @@ const BulkActionControls = ({ selected, reload }) => (
   </span>
 );
 
-const SelectionControls = ({ deselected, onSelectAll, onSelectNone }) =>
-  deselected.length === 0 ? (
-    <StackedCheckBox checked={true} onChange={onSelectNone} />
+const SelectionControls = ({ allSelected, toggleAll, clear }) =>
+  allSelected ? (
+    <StackedCheckBox checked={true} onChange={clear} />
   ) : (
-    <StackedCheckBox checked={false} onChange={onSelectAll} />
+    <StackedCheckBox checked={false} onChange={toggleAll} />
   );
