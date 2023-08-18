@@ -47,6 +47,7 @@ import {
   VisualizationActionButtonsContainer,
   VisualizationSlowSpinner,
 } from "./Visualization.styled";
+import { log } from "cljs/lambdaisland.glogi";
 
 const defaultProps = {
   errorMessageOverride: undefined,
@@ -453,6 +454,8 @@ class Visualization extends PureComponent {
         hasHeaderContent &&
         (loading || error || noResults || isHeaderEnabled)) ||
       (replacementContent && (dashcard.size_y !== 1 || isMobile));
+      
+    console.log(clicked)
 
     return (
       <ErrorBoundary>

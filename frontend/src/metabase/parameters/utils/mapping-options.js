@@ -81,6 +81,7 @@ export function getParameterMappingOptions(
   }
 
   const question = new Question(card, metadata);
+  console.log(question);
   const query = question.query();
   const options = [];
   if (question.isDataset()) {

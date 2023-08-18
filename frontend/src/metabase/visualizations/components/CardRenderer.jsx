@@ -38,6 +38,7 @@ class CardRenderer extends Component {
 
   componentDidMount() {
     this.renderChart();
+    console.log(this.props);
   }
 
   componentDidUpdate() {

@@ -27,19 +27,21 @@ class ClickMappingsInner extends Component {
     };
 
     const unsetTargetsWithSourceOptions = _.chain(unsetTargets)
-      .map(target => ({
-        target,
-        sourceOptions: _.chain(sourceOptions)
-          .mapObject((sources, sourceType) =>
-            sources
+      .map(target => {
+        console.log(target)
+        return ({
+          target,
+          sourceOptions: _.chain(sourceOptions)
+            .mapObject((sources, sourceType) => sources
               .filter(target.sourceFilters[sourceType])
-              .map(getSourceOption[sourceType]),
-          )
-          .pairs()
-          .filter(([, sources]) => sources.length > 0)
-          .object()
-          .value(),
-      }))
+              .map(getSourceOption[sourceType])
+            )
+            .pairs()
+            .filter(([, sources]) => sources.length > 0)
+            .object()
+            .value(),
+        });
+      })
       .filter(({ sourceOptions }) => Object.keys(sourceOptions).length > 0)
       .value();
 

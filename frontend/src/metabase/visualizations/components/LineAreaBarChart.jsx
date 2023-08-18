@@ -138,6 +138,8 @@ export default class LineAreaBarChart extends Component {
   getSettings() {
     const fidelity = this.getFidelity();
 
+    console.log("LineAreaBarChart", this.props.settings)
+
     const settings = { ...this.props.settings };
 
     // smooth interpolation at smallest x/y fidelity
@@ -335,6 +337,7 @@ function transformSingleSeries(s, series, seriesIndex) {
 
   const { cols, rows } = data;
   const settings = getComputedSettingsForSeries([s]);
+  console.log(settings)
 
   const dimensions = (settings["graph.dimensions"] || []).filter(
     d => d != null,
@@ -412,6 +415,7 @@ function transformSingleSeries(s, series, seriesIndex) {
       },
     }));
   } else {
+    console.log("dimensions.length <= 1");
     // dimensions.length <= 1
     const dimensionColumnIndex = dimensionColumnIndexes[0];
     return metricColumnIndexes.map(metricColumnIndex => {
@@ -439,7 +443,7 @@ function transformSingleSeries(s, series, seriesIndex) {
           _seriesIndex: seriesIndex,
           // use underlying column name as the seriesKey since it should be unique
           // EXCEPT for dashboard multiseries, so check seriesIndex == 0
-          _seriesKey: seriesIndex === 0 && col ? col.name : name,
+          _seriesKey: seriesIndex === 0 && col ? col.name : name
         },
         data: {
           rows: rows.map((row, rowIndex) => {

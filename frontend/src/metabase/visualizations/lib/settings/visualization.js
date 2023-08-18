@@ -92,6 +92,7 @@ export function getComputedSettingsForSeries(series) {
   }
   const settingsDefs = getSettingDefintionsForSeries(series);
   const storedSettings = getStoredSettingsForSeries(series);
+  console.log({ settingsDefs, storedSettings });
   return getComputedSettings(settingsDefs, series, storedSettings);
 }
 
