@@ -49,7 +49,7 @@ jobs:
           return download_url;
     - name: download-uberjar-artifact
       run: |
-        DOWNLOAD_LINK="${{ steps.find_release_artifact.outputs.result }}"
+        DOWNLOAD_LINK=${{ steps.find_release_artifact.outputs.result }}
 
         curl -sL \
             -H "Accept: application/vnd.github+json" \
