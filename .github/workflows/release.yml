@@ -42,10 +42,14 @@ jobs:
             throw new Error(`No artifacts found for ${inputs.commit}`);
           }
 
-          return artifacts.data.artifacts[0].archive_download_url;
+          const download_url = artifacts.data.artifacts[0].archive_download_url;
+
+          console.log('download url', download_url);
+
+          return download_url;
     - name: download-uberjar-artifact
       run: |
-        DOWNLOAD_LINK="$(echo ${{ steps.find_release_artifact.outputs.result }})"
+        DOWNLOAD_LINK="${{ steps.find_release_artifact.outputs.result }}"
 
         curl -sL \
             -H "Accept: application/vnd.github+json" \
@@ -68,49 +72,6 @@ jobs:
           ./metabase.jar
           ./COMMIT-ID
           ./SHA256.sum
-
-  push-tags:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        edition: [oss, ee]
-    steps:
-    # EE is always v1.x.y, OSS is always v0.x.y
-    - name: Determine the canonical version
-      uses: actions/github-script@v6
-      id: canonical_version
-      with:
-        result-encoding: string
-        script: |
-          const version = '${{ inputs.version }}';
-          const edition = '${{ matrix.edition }}';
-
-          const canonical_version = edition === "ee"
-            ? version.replace(/^v0\./, "v1."); // always e.g. v1.47.2
-            : version.replace(/^v1\./, "v0."); // always e.g. v0.47.2
-
-          console.log("The canonical version of this Metabase", edition, "edition is", canonical_version);
-
-          // delete old ref
-          await github.rest.git.deleteRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: `refs/tags/${canonical_version}`,
-          });
-
-          // create new ref
-          const newRef = await github.rest.git.createRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: `refs/tags/${canonical_version}`,
-            sha: '${{ inputs.commit }}',
-          });
-
-          if (newRef.status !== 201) {
-            console.error(`failed to tag release`);
-            process.exit(1);
-          }
 
   # trigger-docs-update:
   #   runs-on: ubuntu-22.04
@@ -136,6 +97,7 @@ jobs:
     strategy:
       matrix:
         java-version: [11, 17]
+        edition: [oss, ee]
     steps:
     - name: Prepare JRE (Java Run-time Environment)
       uses: actions/setup-java@v3
@@ -146,7 +108,7 @@ jobs:
     - uses: actions/download-artifact@v3
       name: Retrieve previously downloaded Uberjar
       with:
-        name: metabase-uberjar-${{ github.ref_name }}
+        name: metabase-${{ matrix.edition }}-uberjar
     - name: Reveal its version.properties
       run: jar xf metabase.jar version.properties && cat version.properties
     - name: Display when and where it was downloaded
@@ -162,6 +124,50 @@ jobs:
       timeout-minutes: 3
     - name: Check API health
       run: curl -s localhost:3000/api/health
+
+  push-tags:
+    needs: check-uberjar
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        edition: [oss, ee]
+    steps:
+    # EE is always v1.x.y, OSS is always v0.x.y
+    - name: Determine the canonical version
+      uses: actions/github-script@v6
+      id: canonical_version
+      with:
+        result-encoding: string
+        script: |
+          const version = '${{ inputs.version }}';
+          const edition = '${{ matrix.edition }}';
+
+          const canonical_version = edition === "ee"
+            ? version.replace(/^v0\./, "v1.") // always e.g. v1.47.2
+            : version.replace(/^v1\./, "v0."); // always e.g. v0.47.2
+
+          console.log("The canonical version of this Metabase", edition, "edition is", canonical_version);
+
+          // delete old ref
+          await github.rest.git.deleteRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: `refs/tags/${canonical_version}`,
+          });
+
+          // create new ref
+          const newRef = await github.rest.git.createRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: `refs/tags/${canonical_version}`,
+            sha: '${{ inputs.commit }}',
+          });
+
+          if (newRef.status !== 201) {
+            console.error(`failed to tag release`);
+            process.exit(1);
+          }
 
   upload-to-s3:
     runs-on: ubuntu-22.04
@@ -191,7 +197,7 @@ jobs:
           const edition = '${{ matrix.edition }}';
 
           const version_path = edition === 'ee'
-            ? 'enterprise/' + version.replace(/^v0\./, "v1."); // always e.g. v1.47.2
+            ? 'enterprise/' + version.replace(/^v0\./, "v1.") // always e.g. v1.47.2
             : version.replace(/^v1\./, "v0."); // always e.g. v0.45.6;
 
           console.log("The download path for this", edition, "edition is", version_path);
