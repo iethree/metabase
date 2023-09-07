@@ -40,7 +40,7 @@ jobs:
           });
 
           if (!artifacts.data?.artifacts?.[0]?.archive_download_url) {
-            throw new Error(`No artifacts found for ${inputs.commit}`);
+            throw new Error(`No artifacts found for ${{ inputs.commit }}`);
           }
 
           const download_url = artifacts.data.artifacts[0].archive_download_url;
@@ -50,21 +50,19 @@ jobs:
           return download_url;
     - name: download-uberjar-artifact
       env:
-        DOWNLOAD_LINK: ${{ steps.find_release_artifact.outputs.result }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        curl -sL \
+        curl -L \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            $DOWNLOAD_LINK \
+            ${{ steps.find_release_artifact.outputs.result }} \
             -o mb.zip
-        ls
-    - run: unzip mb.zip
+    - run: unzip mb.zip && ls && mv ./target/uberjar/metabase.jar ./metabase.jar
     - name: Verify that this is a valid JAR file
       run: file --mime-type ./metabase.jar | grep "application/zip"
-    - name: verify_checksum
-      run: |
-        grep -q $(sha256sum ./metabase.jar) SHA256.sum && echo "checksums match" || exit 1
+    - name: Verify Checksum
+      run: grep -q $(sha256sum ./metabase.jar) SHA256.sum && echo "checksums match" || exit 1
     - name: Upload Uberjar as artifact
       uses: actions/upload-artifact@v3
       with:
@@ -91,6 +89,7 @@ jobs:
   #             }
   #           });
 
+  # should we move this to the pre-release workflow?
   check-uberjar:
     runs-on: ubuntu-22.04
     needs: download-uberjar
@@ -112,12 +111,9 @@ jobs:
         name: metabase-${{ matrix.edition }}-uberjar
     - name: Reveal its version.properties
       run: jar xf metabase.jar version.properties && cat version.properties
-    - name: Display when and where it was downloaded
-      run: |
-        cat timestamp
-        cat url.txt
-    - name: Show the checksum
-      run: cat SHA256.sum
+    # TODO: check the version against the input version
+    - name: Verify Checksum
+      run: grep -q $(sha256sum ./metabase.jar) SHA256.sum && echo "checksums match" || exit 1
     - name: Launch Metabase Uberjar (and keep it running)
       run: java -jar ./metabase.jar &
     - name: Wait for Metabase to start
@@ -127,6 +123,7 @@ jobs:
       run: curl -s localhost:3000/api/health
 
   push-tags:
+    permissions: write-all
     needs: check-uberjar
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -135,9 +132,8 @@ jobs:
         edition: [oss, ee]
     steps:
     # EE is always v1.x.y, OSS is always v0.x.y
-    - name: Determine the canonical version
+    - name: Tag Release
       uses: actions/github-script@v6
-      id: canonical_version
       with:
         result-encoding: string
         script: |
@@ -155,7 +151,9 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             ref: `refs/tags/${canonical_version}`,
-          });
+          })
+            .catch((err) => console.warn('cannot delete existing tag', err))
+            .then(() => console.log('deleted existing tag', canonical_version));
 
           // create new ref
           const newRef = await github.rest.git.createRef({
@@ -206,26 +204,79 @@ jobs:
     - name: Upload to S3
       run:
         # FIXME: test bucket
-        aws s3 cp ./target/uberjar/metabase.jar s3://iethree-downloads.metabase.com/${{ steps.version_path.outputs.result }}/metabase.jar
+        aws s3 cp ./metabase.jar s3://iethree-downloads.metabase.com/${{ steps.version_path.outputs.result }}/metabase.jar
 
+  verify-s3-download:
+    runs-on: ubuntu-22.04
+    needs: upload-to-s3
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        edition: [oss, ee]
+    steps:
+    - uses: actions/download-artifact@v3
+      name: Retrieve uberjar artifact
+      with:
+        name: metabase-${{ matrix.edition }}-uberjar
+    - name: Determine the download path ## EE is always v1.x.y, OSS is always v0.x.y
+      uses: actions/github-script@v6
+      id: version_path
+      with:
+        result-encoding: string
+        script: |
+          const version = '${{ inputs.version }}';
+          const edition = '${{ matrix.edition }}';
+
+          const version_path = edition === 'ee'
+            ? 'enterprise/' + version.replace(/^v0\./, "v1.") // always e.g. v1.47.2
+            : version.replace(/^v1\./, "v0."); // always e.g. v0.45.6;
+
+          console.log("The download path for this", edition, "edition is", version_path);
+          return version_path;
+    - name: Upload to S3
+      run:
+        # FIXME: test bucket
+        curl -L http://iethree-downloads.metabase.com.s3.us-east-1.amazonaws.com/${{ steps.version_path.outputs.result }}/metabase.jar -o metabase-downloaded.jar
+    - name: Verify Checksum
+      run: grep -q $(sha256sum ./metabase-downloaded.jar) SHA256.sum && echo "checksums match" || exit 1
 
   containerize:
     runs-on: ubuntu-22.04
     needs: check-uberjar
     timeout-minutes: 15
+    strategy:
+      matrix:
+        edition: [oss, ee]
     services:
       registry:
         image: registry:2
         ports:
           - 5000:5000
     steps:
+    # EE is always v1.x.y, OSS is always v0.x.y
+    - name: Determine the docker version tag
+      uses: actions/github-script@v6
+      id: canonical_version
+      with:
+        result-encoding: string
+        script: |
+          const version = '${{ inputs.version }}';
+          const edition = '${{ matrix.edition }}';
+
+          const canonical_version = edition === "ee"
+            ? version.replace(/^v0\./, "v1.") // always e.g. v1.47.2
+            : version.replace(/^v1\./, "v0."); // always e.g. v0.47.2
+
+          console.log("The canonical version of this Metabase", edition, "edition is", canonical_version);
+
+          return canonical_version;
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0  # IMPORTANT! to get all the tags
     - uses: actions/download-artifact@v3
       name: Retrieve previously downloaded Uberjar
       with:
-        name: metabase-uberjar-${{ github.ref_name }}
+        name: metabase-${{ matrix.edition }}-uberjar
     - name: Move the Uberjar to the context dir
       run: mv ./metabase.jar bin/docker/.
     - name: Set up Docker Buildx
@@ -239,12 +290,12 @@ jobs:
         context: bin/docker/.
         platforms: linux/amd64
         network: host
-        tags: localhost:5000/local-metabase:${{ github.ref_name }}
+        tags: localhost:5000/local-metabase:${{ steps.canonical_version.outputs.result }}
         no-cache: true
         push: true
 
     - name: Launch container
-      run: docker run --rm -dp 3000:3000 localhost:5000/local-metabase:${{ github.ref_name }}
+      run: docker run --rm -dp 3000:3000 localhost:5000/local-metabase:${{ steps.canonical_version.outputs.result }}
       timeout-minutes: 5
     - name: Wait for Metabase to start
       run: while ! curl -s 'http://localhost:3000/api/health' | grep '{"status":"ok"}'; do sleep 1; done
@@ -252,7 +303,7 @@ jobs:
 
     - name: Determine the target Docker Hub repository
       run: |
-        if [[ ${{ github.ref_name }} == v1* ]]; then
+        if [[ "${{ matrix.edition }}" == "ee" ]]; then
           echo "Metabase EE: image is going to be pushed to ${{ github.repository_owner }}/metabase-enterprise"
           echo "DOCKERHUB_REPO=${{ github.repository_owner }}/metabase-enterprise" >> $GITHUB_ENV
         else
@@ -267,9 +318,9 @@ jobs:
         password: ${{ secrets.DOCKERHUB_RELEASE_TOKEN }}
     - name: Retag and push container image to Docker Hub
       run: |
-        echo "Pushing ${{ github.ref_name }} to ${{ env.DOCKERHUB_REPO }} ..."
-        docker tag localhost:5000/local-metabase:${{ github.ref_name }} ${{ env.DOCKERHUB_REPO }}:${{ github.ref_name }}
-        docker push ${{ env.DOCKERHUB_REPO }}:${{ github.ref_name }}
+        echo "Pushing ${{ steps.canonical_version.outputs.result }} to ${{ env.DOCKERHUB_REPO }} ..."
+        docker tag localhost:5000/local-metabase:${{ steps.canonical_version.outputs.result }} ${{ env.DOCKERHUB_REPO }}:${{ steps.canonical_version.outputs.result }}
+        docker push ${{ env.DOCKERHUB_REPO }}:${{ steps.canonical_version.outputs.result }}
         echo "Finished!"
 
     - name: Check if the container image should be tagged as latest
@@ -354,7 +405,7 @@ jobs:
       if: ${{ steps.latest_version_check.outputs.result == 'latest' }}
       run: |
         echo "Pushing ${{ env.DOCKERHUB_REPO }}:latest ..."
-        docker tag localhost:5000/local-metabase:${{ github.ref_name }} ${{ env.DOCKERHUB_REPO }}:latest
+        docker tag localhost:5000/local-metabase:${{ steps.canonical_version.outputs.result }} ${{ env.DOCKERHUB_REPO }}:latest
         docker push ${{ env.DOCKERHUB_REPO }}:latest
         echo "Finished!"
 
@@ -362,6 +413,9 @@ jobs:
     runs-on: ubuntu-22.04
     needs: containerize
     timeout-minutes: 15
+    strategy:
+      matrix:
+        edition: [oss, ee]
     steps:
     - name: Login to Docker Hub # authenticated, to avoid being rate-throttled
       uses: docker/login-action@v2
@@ -370,18 +424,35 @@ jobs:
         password: ${{ secrets.DOCKERHUB_RELEASE_TOKEN }}
     - name: Determine the container image to pull
       run: |
-        if [[ ${{ github.ref_name }} == v1* ]]; then
+        if [[ "${{ matrix.edition }}" = "ee" ]]; then
           echo "DOCKERHUB_REPO=${{ github.repository_owner }}/metabase-enterprise" >> $GITHUB_ENV
         else
           echo "DOCKERHUB_REPO=${{ github.repository_owner }}/metabase" >> $GITHUB_ENV
         fi
+        # EE is always v1.x.y, OSS is always v0.x.y
+    - name: Determine the docker version tag
+      uses: actions/github-script@v6
+      id: canonical_version
+      with:
+        result-encoding: string
+        script: |
+          const version = '${{ inputs.version }}';
+          const edition = '${{ matrix.edition }}';
+
+          const canonical_version = edition === "ee"
+            ? version.replace(/^v0\./, "v1.") // always e.g. v1.47.2
+            : version.replace(/^v1\./, "v0."); // always e.g. v0.47.2
+
+          console.log("The canonical version of this Metabase", edition, "edition is", canonical_version);
+
+          return canonical_version;
     - name: Pull the container image
       run: |
-        echo "Pulling container image ${{ env.DOCKERHUB_REPO }}:${{ github.ref_name }} ..."
-        docker pull ${{ env.DOCKERHUB_REPO }}:${{ github.ref_name }}
+        echo "Pulling container image ${{ env.DOCKERHUB_REPO }}:${{ steps.canonical_version.outputs.result }} ..."
+        docker pull ${{ env.DOCKERHUB_REPO }}:${{ steps.canonical_version.outputs.result }}
         echo "Successful!"
     - name: Launch container
-      run: docker run --rm -dp 3000:3000 ${{ env.DOCKERHUB_REPO }}:${{ github.ref_name }}
+      run: docker run --rm -dp 3000:3000 ${{ env.DOCKERHUB_REPO }}:${{ steps.canonical_version.outputs.result }}
       timeout-minutes: 5
     - name: Wait for Metabase to start
       run: while ! curl -s 'http://localhost:3000/api/health' | grep '{"status":"ok"}'; do sleep 1; done
@@ -404,4 +475,4 @@ jobs:
   #       aws-secret-access-key: ${{ secrets.AWS_S3_RELEASE_SECRET_ACCESS_KEY }}
   #       aws-region: us-east-1
   #   - name: Publish Elastic Beanstalk artifacts
-  #     run: ./bin/ebs.sh :version ${{ github.ref_name }}
+  #     run: ./bin/ebs.sh :version ${{ steps.canonical_version.outputs.result }}
