@@ -1,0 +1,37 @@
+{
+  "name": "release-helper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "run/build.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --platform=node --target=node16",
+    "release": "tsx run/release.ts",
+    "build-offline": "tsx run/release-offline.ts",
+    "release-notes": "tsx run/release-notes.ts",
+    "version-info": "tsx run/version-info.ts",
+    "check-release": "tsx run/check-release.ts",
+    "prettier": "prettier --write"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@octokit/plugin-paginate-rest": "^8.0.0",
+    "@octokit/rest": "^20.0.1",
+    "@slack/web-api": "^6.9.0",
+    "@types/inquirer": "^9.0.3",
+    "dotenv": "^16.3.1",
+    "esbuild": "^0.19.2",
+    "inquirer": "^9.2.10",
+    "open": "^9.1.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.1.6",
+    "underscore": "^1.13.6",
+    "zx": "^7.2.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.2"
+  }
+}

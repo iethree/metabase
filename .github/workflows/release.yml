@@ -1,4 +1,5 @@
 name: Release [WIP]
+run-name: Release ${{ inputs.version }}
 
 on:
   workflow_dispatch:
@@ -429,7 +430,7 @@ jobs:
         else
           echo "DOCKERHUB_REPO=${{ github.repository_owner }}/metabase" >> $GITHUB_ENV
         fi
-        # EE is always v1.x.y, OSS is always v0.x.y
+      # EE is always v1.x.y, OSS is always v0.x.y
     - name: Determine the docker version tag
       uses: actions/github-script@v6
       id: canonical_version
@@ -457,6 +458,106 @@ jobs:
     - name: Wait for Metabase to start
       run: while ! curl -s 'http://localhost:3000/api/health' | grep '{"status":"ok"}'; do sleep 1; done
       timeout-minutes: 3
+
+  draft-release-notes:
+    needs: [verify-docker-pull, verify-s3-download]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions: write-all
+    strategy:
+      matrix:
+        edition: [oss, ee]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          sparse-checkout: release
+      - name: prepare release scripts
+        run: cd release && yarn && yarn build
+      - uses: actions/download-artifact@v3
+        name: Retrieve uberjar artifact
+        with:
+          name: metabase-${{ matrix.edition }}-uberjar
+      - name: Read Checksum
+        run: |
+          CHECKSUM=$(cat SHA256.sum)
+          echo "CHECKSUM=$CHECKSUM" >> $GITHUB_ENV
+      - name: Publish draft release notes
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const { publishRelease } = require('${{ github.workspace }}/release/dist/index.js');
+
+            const version = '${{ inputs.version }}';
+            const edition = '${{ matrix.edition }}';
+
+            const canonical_version = edition === "ee"
+              ? version.replace(/^v0\./, "v1.") // always e.g. v1.47.2
+              : version.replace(/^v1\./, "v0."); // always e.g. v0.47.2
+
+            await publishRelease({
+              github,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              version: canonical_version,
+              checksum: '${{ env.CHECKSUM }}',
+            }).then(() => {
+              console.log('Successfully published release notes', '${{ inputs.version }}');
+            }).catch((err) => {
+              console.error('Failed to publish release notes', '${{ inputs.version }}', err);
+              process.exit(1);
+            });
+
+  publish-version-info:
+    runs-on: ubuntu-22.04
+    needs: [verify-docker-pull, verify-s3-download]
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        edition: [oss, ee]
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_S3_RELEASE_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_S3_RELEASE_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - uses: actions/checkout@v3
+      with:
+        sparse-checkout: release
+    - name: Prepare build scripts
+      run: cd ${{ github.workspace }}/release && yarn && yarn build # should cache
+    - name: Publish release notes
+      uses: actions/github-script@v6
+      id: new_version_info
+      with:
+        result-encoding: string
+        script: |
+          const { getVersionInfo } = require('${{ github.workspace }}/release/dist/index.js');
+
+          const newVersionInfo = await getVersionInfo({
+            github,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            version: "${{ inputs.version }}",
+          });
+
+          fs.writeFileSync('version-info.json', JSON.stringify(newVersionInfo, null, 2));
+    - name: Upload new version-info.json to S3
+      # FIXME: test bucket names
+      run: |
+        if [[ "${{ matrix.edition }}" == "ee" ]]; then
+          aws s3 cp version-info.json s3://iethree-static.metabase.com/version-info-ee.json
+        else
+          aws s3 cp version-info.json s3://iethree-static.metabase.com/version-info.json
+        fi
+
+    # - name: Create cloudfront invalidation for version-info.json and version-info-ee.json
+    #   run: |
+    #     aws cloudfront create-invalidation \
+    #     --distribution-id E1HU16PWP1JPMC \
+    #     --paths "/version-info.json" "/version-info-ee.json"
+
 
   # publish-elastic-beanstalk-artifacts:
   #   runs-on: ubuntu-22.04
