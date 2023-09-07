@@ -27,6 +27,7 @@ jobs:
         echo "Please, try again."
         exit 1
     - name: find_release_artifact
+      id: find_release_artifact
       uses: actions/github-script@v6
       with:
         result-encoding: string
