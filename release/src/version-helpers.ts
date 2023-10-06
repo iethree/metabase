@@ -67,10 +67,12 @@ export const isRCVersion = (version: string) =>
   isValidVersionString(version) && /rc/i.test(version);
 
 export const getMajorVersion = (versionString: string) =>
-  versionString
-    .replace(/^[^\.]+\./, "")
-    .replace(/-rc\d+/i, "")
-    .split(".")[0];
+  Number(
+    versionString
+      .replace(/^[^\.]+\./, "")
+      .replace(/-rc\d+/i, "")
+      .split(".")[0]
+  );
 
 export const getReleaseBranch = (versionString: string) => {
   if (!isValidVersionString(versionString)) {
