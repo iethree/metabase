@@ -1,10 +1,7 @@
 name: Re-run Flaky Workflows
 
 on:
-  workflow_run:
-    workflows: [Backend, Driver Tests, E2E Tests, Frontend]
-    types: [completed]
-    branches: [master, 'release-x.**', 'backport-**']
+  pull_request_review:
 
 jobs:
   rerun-on-failure:
