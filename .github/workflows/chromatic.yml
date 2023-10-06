@@ -1,9 +1,6 @@
 name: Chromatic Storybook deployment
 
 on:
-  push:
-    branches:
-      - "master"
   pull_request:
     types: [synchronize, labeled, unlabeled]
 

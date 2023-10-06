@@ -1,10 +1,6 @@
 name: Fuzzing
 
 on:
-  push:
-    branches:
-      - 'master'
-      - 'release-**'
   pull_request:
     paths-ignore:
     - 'docs/**'

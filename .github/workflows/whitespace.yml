@@ -1,10 +1,6 @@
 name: Whitespace
 
 on:
-  push:
-    branches:
-      - 'master'
-      - 'release-**'
   pull_request:
 
 jobs:
