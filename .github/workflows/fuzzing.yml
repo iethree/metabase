@@ -1,13 +1,6 @@
 name: Fuzzing
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'master'
-      - 'release-**'
-    paths:
-      - 'frontend/src/metabase-lib/expressions/**'
   pull_request:
     paths:
       - 'frontend/src/metabase-lib/expressions/**'
