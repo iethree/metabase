@@ -208,6 +208,7 @@ jobs:
       if: ${{ steps.is_latest.outputs.result != 'false' }}
       run: aws s3 cp ./metabase.jar s3://${{ vars.AWS_S3_DOWNLOADS_BUCKET }}/${{ steps.latest_path.outputs.result }}/metabase.jar
     - name: Create cloudfront invalidation
+      if: false # FIXME
       run: |
         aws cloudfront create-invalidation \
         --distribution-id ${{ vars.AWS_CLOUDFRONT_DOWNLOADS_ID }} \
@@ -446,6 +447,7 @@ jobs:
           });
 
   trigger-docs-update:
+    if: false # FIXME
     needs: push-tags
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -567,7 +569,41 @@ jobs:
           aws s3 cp version-info.json s3://${{ vars.AWS_S3_STATIC_BUCKET }}/version-info.json
         fi
     - name: Create cloudfront invalidation for version-info.json and version-info-ee.json
+      if: false # FIXME
       run: |
         aws cloudfront create-invalidation \
         --distribution-id ${{ vars.AWS_CLOUDFRONT_STATIC_ID }} \
         --paths "/version-info.json" "/version-info-ee.json"
+
+  manage-issues:
+    permissions: write-all
+    runs-on: ubuntu-22.04
+    # needs: [publish-version-info, draft-release-notes]
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        sparse-checkout: release
+    - name: Prepare build scripts
+      run: cd ${{ github.workspace }}/release && yarn && yarn build
+    - name: Update milestones
+      uses: actions/github-script@v6
+      with:
+        script: | # js
+          const { closeMilestone, openNextMilestones } = require('${{ github.workspace }}/release/dist/index.cjs');
+
+          const version = '${{ inputs.version }}';
+
+          await closeMilestone({
+            github,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            version,
+          });
+
+          await openNextMilestones({
+            github,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            version,
+          });
