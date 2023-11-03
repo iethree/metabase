@@ -208,6 +208,7 @@ jobs:
       if: ${{ steps.is_latest.outputs.result != 'false' }}
       run: aws s3 cp ./metabase.jar s3://${{ vars.AWS_S3_DOWNLOADS_BUCKET }}/${{ steps.latest_path.outputs.result }}/metabase.jar
     - name: Create cloudfront invalidation
+      if: false
       run: |
         aws cloudfront create-invalidation \
         --distribution-id ${{ vars.AWS_CLOUDFRONT_DOWNLOADS_ID }} \
@@ -405,7 +406,6 @@ jobs:
       timeout-minutes: 3
 
   push-tags:
-    permissions: write-all
     needs: [verify-s3-download, verify-docker-pull, check-version]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -417,8 +417,10 @@ jobs:
       run: cd release && yarn && yarn build
     - name: Tag Release
       uses: actions/github-script@v6
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT }}
       with:
-        result-encoding: string
+
         script: | # js
           const { tagRelease } = require('${{ github.workspace }}/release/dist/index.cjs');
 
@@ -449,12 +451,15 @@ jobs:
             process.exit(1);
           });
     - name: Reorder release tags to put OSS first
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT }}
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
         $GITHUB_WORKSPACE/release/reorder-tags.sh ${{ needs.check-version.outputs.ee }} ${{ inputs.commit }}
 
   trigger-docs-update:
+    if: false
     needs: push-tags
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -576,6 +581,7 @@ jobs:
           aws s3 cp version-info.json s3://${{ vars.AWS_S3_STATIC_BUCKET }}/version-info.json
         fi
     - name: Create cloudfront invalidation for version-info.json and version-info-ee.json
+      if: false
       run: |
         aws cloudfront create-invalidation \
         --distribution-id ${{ vars.AWS_CLOUDFRONT_STATIC_ID }} \
