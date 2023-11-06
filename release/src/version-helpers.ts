@@ -100,7 +100,7 @@ export const isLatestVersion = (thisVersion: string, allVersions: string[]) => {
   return compareVersions(String(coerce(thisVersion.replace(/(v1|v0)\./, ''))), lastVersion) > -1;
 };
 
-const versionRequirements: Record<number, { java: number, node: number }> = {
+export const versionRequirements: Record<number, { java: number, node: number }> = {
   43: { java: 8, node: 14 },
   44: { java: 11, node: 14 },
   45: { java: 11, node: 14 },
