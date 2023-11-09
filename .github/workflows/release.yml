@@ -236,6 +236,7 @@ jobs:
       if: ${{ steps.is_latest.outputs.result != 'false' }}
       run: aws s3 cp ./metabase.jar s3://${{ vars.AWS_S3_DOWNLOADS_BUCKET }}/${{ steps.latest_path.outputs.result }}/metabase.jar
     - name: Create cloudfront invalidation
+      if: false
       run: |
         aws cloudfront create-invalidation \
         --distribution-id ${{ vars.AWS_CLOUDFRONT_DOWNLOADS_ID }} \
@@ -483,6 +484,7 @@ jobs:
         $GITHUB_WORKSPACE/release/reorder-tags.sh ${{ needs.check-version.outputs.ee }} ${{ inputs.commit }}
 
   trigger-docs-update:
+    if: false
     needs: push-tags
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -604,6 +606,7 @@ jobs:
           aws s3 cp version-info.json s3://${{ vars.AWS_S3_STATIC_BUCKET }}/version-info.json
         fi
     - name: Create cloudfront invalidation for version-info.json and version-info-ee.json
+      if: false
       run: |
         aws cloudfront create-invalidation \
         --distribution-id ${{ vars.AWS_CLOUDFRONT_STATIC_ID }} \

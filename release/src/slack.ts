@@ -80,7 +80,7 @@ async function getExistingSlackMessage(version: string) {
 }
 
 const getReleaseTitle = (version: string) =>
-  `:rocket: *${getGenericVersion(version)} Release* :rocket:`;
+  `:rocket:  *${getGenericVersion(version)} Release*  :rocket:`;
 
 function slackLink(text: string, url: string) {
   return `<${url}|${text}>`;
@@ -117,12 +117,12 @@ async function getReleaseMessage({
   const space = "\n";
 
   const stageMessagesText: Record<BuildStage, string> = {
-    "build-start": ":loading: Building",
-    "build-done": ":white_check_mark: Build Complete",
-    "test-start": ":loading: Testing",
-    "test-done": `:white_check_mark: Tests Complete`,
-    "publish-start": ":loading: Publishing",
-    "publish-done": ":white_check_mark: Publish Complete",
+    "build-start": ":loading:  Building",
+    "build-done": ":white_check_mark:  Build Complete",
+    "test-start": ":loading:  Testing",
+    "test-done": `:white_check_mark:  Tests Complete`,
+    "publish-start": ":loading:  Publishing",
+    "publish-done": ":white_check_mark:  Publish Complete",
   };
 
   if (stage === "build-start") {
@@ -136,13 +136,13 @@ async function getReleaseMessage({
 
     return [
       title,
-      preReleaseMessage,
+      `_${preReleaseMessage}_`,
       githubRunLink(stageMessagesText["build-start"], runId, owner, repo),
     ].join(space);
   }
 
   if (!previousMessage) {
-    return `:warning: Something went wrong`;
+    return `:warning:  Something went wrong`;
   }
 
   switch (stage) {
@@ -158,7 +158,7 @@ async function getReleaseMessage({
       ].join(space);
     case "test-done": {
       const publishReminder = `${slackLink(
-        ":rocket: Ready to Publish",
+        ":rocket:  Ready to Publish",
         `https://github.com/${owner}/${repo}/actions/workflows/release.yml`,
       )}`;
 
