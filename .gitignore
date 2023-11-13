@@ -63,6 +63,7 @@
 /storybook-static
 /target
 /test-report-*
+junit.xml
 \#*\#
 bin/node_modules/
 bin/release/aws-eb/metabase-aws-eb.zip

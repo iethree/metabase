@@ -1,9 +1,7 @@
 name: E2E Tests
 
 on:
-  # We'll record runs using Replay.io and their browser on a schedule as an experiment
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref && github.ref || github.run_id }}
@@ -167,6 +165,17 @@ jobs:
           --browser ${{ steps.cypress-prep.outputs.chrome-path }}
         env:
           CYPRESS_QA_DB_MONGO: true
+
+      - name: Upload Test Results
+        uses: ./.github/actions/upload-test-results
+        if: always()
+        with:
+          input-path: ./target/junit
+          output-dir: e2e-${{ matrix.name }}
+          bucket: ${{ vars.AWS_S3_TEST_RESULTS_BUCKET }}
+          aws-access-key-id: ${{ secrets.AWS_TEST_RESULTS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_TEST_RESULTS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Upload Cypress Artifacts upon failure
         uses: actions/upload-artifact@v3

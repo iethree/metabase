@@ -1,8 +1,7 @@
 name: Backend
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch: # for testing FIXME
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref && github.ref || github.run_id }}
@@ -152,6 +151,7 @@ jobs:
         if: failure()
         with:
           path: "target/junit/**/*_test.xml"
+          output-dir: be-tests-java-${{ matrix.java-version }}-${{ matrix.edition }}
           name: JUnit Test Report be-tests-java-11-ee-pre-check
           reporter: java-junit
           list-suites: failed
@@ -199,6 +199,17 @@ jobs:
       - name: Run tests using Java 21 on `master` only
         if: matrix.java-version == 21 && github.ref_name == 'master'
         run: clojure -X:dev:ci:test:${{ matrix.edition }}:${{ matrix.edition }}-dev
+
+      - name: Upload Test Results
+        uses: ./.github/actions/upload-test-results
+        if: always()
+        with:
+          input-path: ./target/junit/
+          output-dir: be-tests-java-${{ matrix.java-version }}-${{ matrix.edition }}
+          bucket: ${{ vars.AWS_S3_TEST_RESULTS_BUCKET }}
+          aws-access-key-id: ${{ secrets.AWS_TEST_RESULTS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_TEST_RESULTS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Publish Test Report (JUnit)
         uses: dorny/test-reporter@v1
