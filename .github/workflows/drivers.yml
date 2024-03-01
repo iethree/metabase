@@ -1,10 +1,6 @@
 name: Driver Tests
 
 on:
-  push:
-    branches:
-      - 'master'
-      - 'release-**'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
