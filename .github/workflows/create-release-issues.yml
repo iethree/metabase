@@ -24,9 +24,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: | # bash
-          git config --global user.email "metabase-bot@metabase.com"
-          git config --global user.name "Metabase bot"
-
           gh issue create \
             --title "Update all cloud customers to ${{ inputs.version }}" \
             --body "please 😁" \
