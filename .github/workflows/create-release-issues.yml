@@ -1,0 +1,33 @@
+on:
+  repository_dispatch:
+    types: ['create-release-issues']
+    inputs:
+      version:
+        description: 'Metabase version (e.g. v1.46.3)'
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Metabase version (e.g. v1.46.3)'
+        type: string
+        required: true
+
+jobs:
+  create-release-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release Issues
+        run: | # bash
+          git config --global user.email "metabase-bot@metabase.com"
+          git config --global user.name "Metabase bot"
+
+          gh issue create \
+            -- title "Update all cloud customers to ${{ inputs.version }}" \
+            -- body "please 😁" \
+            -- label "version release"
+
+          gh issue create \
+            -- title "Set cloud default version to ${{ inputs.version }}" \
+            -- body "please 😁" \
+            -- label "version release"
