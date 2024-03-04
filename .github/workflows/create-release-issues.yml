@@ -1,3 +1,6 @@
+name: Create Cloud Release Issues
+run-name: Cloud Release issues for ${{ inputs.version }}
+
 on:
   repository_dispatch:
     types: ['create-release-issues']
