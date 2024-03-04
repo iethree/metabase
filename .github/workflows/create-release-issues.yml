@@ -26,11 +26,11 @@ jobs:
           git config --global user.name "Metabase bot"
 
           gh issue create \
-            -- title "Update all cloud customers to ${{ inputs.version }}" \
-            -- body "please 😁" \
-            -- label "version release"
+            --title "Update all cloud customers to ${{ inputs.version }}" \
+            --body "please 😁" \
+            --label "version release"
 
           gh issue create \
-            -- title "Set cloud default version to ${{ inputs.version }}" \
-            -- body "please 😁" \
-            -- label "version release"
+            --title "Set cloud default version to ${{ inputs.version }}" \
+            --body "please 😁" \
+            --label "version release"
