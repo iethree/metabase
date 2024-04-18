@@ -52,11 +52,10 @@
    [metabase.util.urls :as urls]
    [ring.util.response :as response]
    [saml20-clj.core :as saml]
-   [schema.core :as s]
    [toucan2.core :as t2])
   (:import
    (java.net URI URISyntaxException)
-   (java.util Base64 UUID)))
+   (java.util Base64)))
 
 (set! *warn-on-reflection* true)
 
@@ -76,7 +75,7 @@
       flatten
       set))
 
-(defn- sync-groups!
+(defn sync-groups!
   "Sync a user's groups based on mappings configured in the SAML settings"
   [user group-names]
   (when (sso-settings/saml-group-sync)
@@ -85,7 +84,7 @@
                                                    (group-names->ids group-names)
                                                    (all-mapped-group-ids)))))
 
-(s/defn ^:private fetch-or-create-user! :- (s/maybe {:id UUID, s/Keyword s/Any})
+(mu/defn ^:private fetch-or-create-user! :- [:maybe [:map [:id uuid?]]]
   "Returns a Session for the given `email`. Will create the user if needed."
   [{:keys [first-name last-name email group-names user-attributes device-info]}]
   (when-not (sso-settings/saml-enabled)
@@ -144,7 +143,7 @@
   (let [redirect (get-in req [:params :redirect])
         redirect-url (if (nil? redirect)
                        (do
-                         (log/warn (trs "Warning: expected `redirect` param, but none is present"))
+                         (log/warn "Warning: expected `redirect` param, but none is present")
                          (public-settings/site-url))
                        (if (has-host? redirect)
                          redirect
@@ -174,7 +173,7 @@
       (saml/validate response idp-cert (sp-cert-keystore-details) {:acs-url (acs-url)
                                                                    :issuer  (sso-settings/saml-identity-provider-issuer)})
       (catch Throwable e
-        (log/error e (trs "SAML response validation failed"))
+        (log/error e "SAML response validation failed")
         (throw (ex-info (tru "Unable to log in: SAML response validation failed")
                         {:status-code 401}
                         e))))))

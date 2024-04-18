@@ -77,9 +77,7 @@ describe("issue 29517 - nested question based on native model with remapped valu
 
   it("drill-through should work (metabase#29517-1)", () => {
     cy.intercept("POST", "/api/dataset").as("dataset");
-    cy.get("@nestedQuestionId").then(id => {
-      visitQuestion(id);
-    });
+    visitQuestion("@nestedQuestionId");
 
     // We can click on any circle; this index was chosen randomly
     cy.get("circle").eq(25).click({ force: true });
@@ -96,6 +94,10 @@ describe("issue 29517 - nested question based on native model with remapped valu
   });
 
   it("click behavior to custom destination should work (metabase#29517-2)", () => {
+    cy.intercept("/api/dashboard/*/dashcard/*/card/*/query").as(
+      "dashcardQuery",
+    );
+
     visitDashboard("@dashboardId");
 
     cy
@@ -105,7 +107,10 @@ describe("issue 29517 - nested question based on native model with remapped valu
     cy.wait("@loadTargetDashboard");
 
     cy.location("pathname").should("eq", `/dashboard/${ORDERS_DASHBOARD_ID}`);
-    cy.get(".cellData").contains("37.65");
+
+    cy.wait("@dashcardQuery");
+
+    cy.get("[data-testid=cell-data]").contains("37.65");
   });
 });
 

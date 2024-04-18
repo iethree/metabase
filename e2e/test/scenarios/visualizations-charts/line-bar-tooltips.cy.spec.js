@@ -5,6 +5,7 @@ import {
   visitDashboard,
   saveDashboard,
   addOrUpdateDashboardCard,
+  modal,
 } from "e2e/support/helpers";
 
 const { ORDERS, ORDERS_ID } = SAMPLE_DATABASE;
@@ -467,7 +468,7 @@ function testTooltipText(rowPairs = []) {
 
 function openDashCardVisualizationOptions() {
   cy.icon("pencil").click();
-  cy.get(".Card").realHover();
+  cy.findByTestId("dashcard").realHover();
   cy.icon("palette").click();
 }
 
@@ -476,7 +477,7 @@ function updateColumnTitle(originalText, updatedText) {
 }
 
 function saveDashCardVisualizationOptions() {
-  cy.get(".Modal").within(() => {
+  modal().within(() => {
     cy.findByText("Done").click();
   });
 

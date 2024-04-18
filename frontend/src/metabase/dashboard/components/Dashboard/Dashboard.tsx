@@ -5,7 +5,10 @@ import type { Route } from "react-router";
 import { usePrevious, useUnmount } from "react-use";
 import _ from "underscore";
 
-import type { NewDashCardOpts } from "metabase/dashboard/actions";
+import type {
+  NewDashCardOpts,
+  SetDashboardAttributesOpts,
+} from "metabase/dashboard/actions";
 import { DashboardHeader } from "metabase/dashboard/components/DashboardHeader";
 import { DashboardControls } from "metabase/dashboard/hoc/DashboardControls";
 import type {
@@ -17,9 +20,9 @@ import { FilterApplyButton } from "metabase/parameters/components/FilterApplyBut
 import SyncedParametersList from "metabase/parameters/components/SyncedParametersList/SyncedParametersList";
 import { getVisibleParameters } from "metabase/parameters/utils/ui";
 import type { EmbeddingParameterVisibility } from "metabase/public/lib/types";
-import type Metadata from "metabase-lib/metadata/Metadata";
-import type { UiParameter } from "metabase-lib/parameters/types";
-import { getValuePopulatedParameters } from "metabase-lib/parameters/utils/parameter-values";
+import type Metadata from "metabase-lib/v1/metadata/Metadata";
+import type { UiParameter } from "metabase-lib/v1/parameters/types";
+import { getValuePopulatedParameters } from "metabase-lib/v1/parameters/utils/parameter-values";
 import type {
   Dashboard as IDashboard,
   DashboardId,
@@ -136,11 +139,8 @@ interface DashboardProps {
   archiveDashboard: (id: DashboardId) => Promise<void>;
 
   onRefreshPeriodChange: (period: number | null) => void;
-  setEditingDashboard: (dashboard: IDashboard | boolean) => void;
-  setDashboardAttributes: (opts: {
-    id: DashboardId;
-    attributes: Partial<IDashboard>;
-  }) => void;
+  setEditingDashboard: (dashboard: IDashboard | null) => void;
+  setDashboardAttributes: (opts: SetDashboardAttributesOpts) => void;
   setSharing: (isSharing: boolean) => void;
   toggleSidebar: (sidebarName: DashboardSidebarName) => void;
   closeSidebar: () => void;
@@ -297,7 +297,7 @@ function DashboardInner(props: DashboardProps) {
   );
 
   const handleSetEditing = useCallback(
-    (dashboard: IDashboard | boolean) => {
+    (dashboard: IDashboard | null) => {
       onRefreshPeriodChange(null);
       setEditingDashboard(dashboard);
     },
@@ -533,6 +533,8 @@ function DashboardInner(props: DashboardProps) {
       {() => (
         <DashboardStyled>
           <DashboardHeaderContainer
+            data-element-id="dashboard-header-container"
+            id="Dashboard-Header-Container"
             isFullscreen={isFullscreen}
             isNightMode={shouldRenderAsNightMode}
           >
@@ -553,13 +555,14 @@ function DashboardInner(props: DashboardProps) {
           <DashboardBody isEditingOrSharing={isEditing || isSharing}>
             <ParametersAndCardsContainer
               id={DASHBOARD_PDF_EXPORT_ROOT_ID}
+              data-element-id="dashboard-parameters-and-cards"
               data-testid="dashboard-parameters-and-cards"
               shouldMakeDashboardHeaderStickyAfterScrolling={
                 !isFullscreen && (isEditing || isSharing)
               }
             >
               {renderParameterList()}
-              <CardsContainer id="Dashboard-Cards-Container">
+              <CardsContainer data-element-id="dashboard-cards-container">
                 {renderContent()}
               </CardsContainer>
             </ParametersAndCardsContainer>
