@@ -26,6 +26,7 @@ CollectionPicker.propTypes = {
   // a collection ID or null (for "root" collection), or undefined if none selected
   value: PropTypes.number,
   // callback that takes a collection ID or null (for "root" collection)
+  // new comment
   onChange: PropTypes.func.isRequired,
 };
 
