@@ -1,7 +1,9 @@
 name: E2E Tests
 
 on:
-  # We'll record runs using Replay.io and their browser on a schedule as an experiment
+  push:
+    branches:
+      - "release-**"
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
@@ -87,8 +89,8 @@ jobs:
       COMMIT_INFO_MESSAGE: ${{ github.event.pull_request.title || github.event.head_commit.message || github.even.head.sha }}
       MB_SNOWPLOW_AVAILABLE: true
       MB_SNOWPLOW_URL: "http://localhost:9090" # Snowplow micro
-      CYPRESS_REPLAYIO_ENABLED: 1
-      CYPRESS_REPLAYIO_ENABLE_UPLOAD: 1
+      CYPRESS_REPLAYIO_ENABLED: 0
+      CYPRESS_REPLAYIO_ENABLE_UPLOAD: 0
       RECORD_REPLAY_METADATA_FILE: /tmp/replay-metadata.json
       RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ github.run_id }}
       REPLAY_API_KEY: ${{ secrets.REPLAY_IO_TOKEN }}
