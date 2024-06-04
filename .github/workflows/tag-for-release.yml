@@ -150,7 +150,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 11
+        java-version: 18
 
     - name: Retrieve test build uberjar artifact for ${{ matrix.edition }}
       id: find_release_artifact
