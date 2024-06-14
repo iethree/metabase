@@ -258,11 +258,11 @@ jobs:
     - name: Upload to s3 latest path
       if: ${{ steps.latest_path.outputs.result != 'false' }}
       run: aws s3 cp ./metabase.jar s3://${{ vars.AWS_S3_DOWNLOADS_BUCKET }}/${{ steps.latest_path.outputs.result }}/metabase.jar
-    - name: Create cloudfront invalidation
-      run: |
-        aws cloudfront create-invalidation \
-        --distribution-id ${{ vars.AWS_CLOUDFRONT_DOWNLOADS_ID }} \
-        --paths /${{ steps.version_path.outputs.result }}/metabase.jar
+    # - name: Create cloudfront invalidation
+    #   run: |
+    #     aws cloudfront create-invalidation \
+    #     --distribution-id ${{ vars.AWS_CLOUDFRONT_DOWNLOADS_ID }} \
+    #     --paths /${{ steps.version_path.outputs.result }}/metabase.jar
 
 
   verify-s3-download:
@@ -633,11 +633,11 @@ jobs:
         else
           aws s3 cp version-info.json s3://${{ vars.AWS_S3_STATIC_BUCKET }}/version-info.json
         fi
-    - name: Create cloudfront invalidation for version-info.json and version-info-ee.json
-      run: |
-        aws cloudfront create-invalidation \
-        --distribution-id ${{ vars.AWS_CLOUDFRONT_STATIC_ID }} \
-        --paths "/version-info.json" "/version-info-ee.json"
+    # - name: Create cloudfront invalidation for version-info.json and version-info-ee.json
+    #   run: |
+    #     aws cloudfront create-invalidation \
+    #     --distribution-id ${{ vars.AWS_CLOUDFRONT_STATIC_ID }} \
+    #     --paths "/version-info.json" "/version-info-ee.json"
 
   publish-complete-message:
     runs-on: ubuntu-22.04
@@ -649,7 +649,7 @@ jobs:
           sparse-checkout: release
       - name: Prepare build scripts
         run: cd ${{ github.workspace }}/release && yarn && yarn build
-      - name: Send publish start message
+      - name: Send publish complete message
         uses: actions/github-script@v7
         env:
           SLACK_RELEASE_CHANNEL: ${{ vars.SLACK_RELEASE_CHANNEL }}
@@ -664,7 +664,7 @@ jobs:
               version: '${{ inputs.version }}',
               runId: '${{ github.run_id }}',
               channelName: '${{ vars.SLACK_RELEASE_CHANNEL }}',
-              generalChannelName: 'general',
+              generalChannelName: 'bot-testing',
             }).catch(console.error);
 
   manage-milestones:
