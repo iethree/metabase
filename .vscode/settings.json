@@ -6,5 +6,8 @@
   "npm.autoDetect": "off",
   "eslint.options": {
     "rulePaths": ["frontend/lint/eslint-rules/"]
+  },
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": "file:///Users/ryan/projects/metabase-fork/.github/workflows/check-milestone.yml"
   }
 }

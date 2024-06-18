@@ -16,6 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: master
           sparse-checkout: release
       - name: Prepare build scripts
         run: cd ${{ github.workspace }}/release && yarn && yarn build
