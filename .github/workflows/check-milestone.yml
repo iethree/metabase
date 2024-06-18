@@ -3,7 +3,7 @@ name: Automatically mark milestone
 on:
   push:
     branches:
-      - release-x.**
+      - "release-**"
 
 jobs:
   milestone-reminder:
