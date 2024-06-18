@@ -3,17 +3,16 @@ name: Automatically mark milestone
 on:
   push:
     branches:
-      - "release-**"
+      - release-x.**
 
 jobs:
-  milestone-reminder:
-    if: github.event.pull_request.merged == true
+  mark-milestone:
     name: automatically set milestone
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     permissions:
       pull-requests: write
-      issues: read
+      issues: write
     steps:
       - uses: actions/checkout@v4
         with:
