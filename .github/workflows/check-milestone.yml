@@ -6,7 +6,7 @@ on:
       - release-x.**
 
 jobs:
-  milestone-reminder:
+  set-milestone:
     name: Automatically set milestone
     runs-on: ubuntu-22.04
     timeout-minutes: 5
