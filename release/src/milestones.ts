@@ -1,3 +1,5 @@
+import _ from "underscore";
+
 import { getMilestones } from "./github";
 import { getLinkedIssues, getPRsFromCommitMessage } from "./linked-issues";
 import type { Issue, GithubProps, Milestone } from "./types";
@@ -35,33 +37,8 @@ function versionSort(a: string, b: string) {
   return 0;
 }
 
-export async function getReleaseCommits({
-  github,
-  owner,
-  repo,
-  sha,
-}: GithubProps & { sha: string }) {
-  // parse back to the last tag? what about a fresh release branch?
-  const commits = await $`git log $(git describe --tags --abbrev=0)..${sha} --oneline`;
+const isNotNull = <T>(value: T | null): value is T => value !== null;
 
-  const messages = commits.stdout.split('\n').filter(Boolean);
-  const prs = messages.flatMap(getPRsFromCommitMessage)
-    .filter(Boolean)
-    .slice(0,10); // FIXME: test code
-
-  const issuesToTag = [];
-
-  for (const pr of prs) {
-    pr && issuesToTag.push(...(await getOriginalPR({
-      github,
-      owner,
-      repo,
-      pullRequestNumber: pr,
-    })));
-  }
-
-  console.log({ issuesToTag })
-}
 
 async function getOriginalPR({
   github,
@@ -129,12 +106,6 @@ async function setMilestone({ github, owner, repo, issueNumber, milestone }: Git
     });
   }
 }
-
-// await getReleaseCommits('81a586df95');
-
-// console.log(await setMilestone({ issueNumber: 15, milestoneId: 14}));
-// console.log(await setMilestone({ issueNumber: 15, milestoneId: 8}));
-
 // get the next open milestone (e.g. 0.57.8) for the given major version (e.g 57)
 export function getNextMilestone(
   { openMilestones, majorVersion }:
@@ -149,8 +120,6 @@ export function getNextMilestone(
 
   return nextMilestone;
 }
-
-const isNotNull = <T>(value: T | null): value is T => value !== null;
 
 export async function setMilestoneForCommits({
   github,
@@ -172,7 +141,12 @@ export async function setMilestoneForCommits({
   console.log('Next milestone:', nextMilestone.title);
 
   // figure out issue or PR
-  const PRsToCheck = commitMessages.flatMap(getPRsFromCommitMessage).filter(isNotNull);
+  const PRsToCheck = _.uniq(
+    commitMessages
+      .flatMap(getPRsFromCommitMessage)
+      .filter(isNotNull)
+  );
+
 
   if (!PRsToCheck.length) {
     throw new Error('No PRs found in commit messages');
