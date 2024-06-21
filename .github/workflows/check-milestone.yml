@@ -30,7 +30,7 @@ jobs:
             const repo = context.repo.repo;
 
             const branchName = '${{ github.ref }}';
-            const commitMessage = '${{ github.event.head_commit.message }}';
+            const commitMessage = context?.payload?.head_commit?.message ?? '';
 
             await setMilestoneForCommits({
               github,
@@ -39,5 +39,3 @@ jobs:
               branchName,
               commitMessages: [commitMessage],
             });
-
-
