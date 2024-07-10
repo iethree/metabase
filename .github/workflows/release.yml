@@ -567,7 +567,7 @@ jobs:
           cd docs/
 
           git add releases.md
-          git commit -m "Update release version list to include $NEW_OSS_VERSION"
+          git commit -m "Update release version list to include $NEW_OSS_VERSION" --force
           git push origin update-version-list-$NEW_OSS_VERSION
 
       - name: open pr with updates
