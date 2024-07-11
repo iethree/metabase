@@ -2,7 +2,7 @@ name: E2E Cross-version Tests
 
 on:
   schedule:
-    - cron: '56 * * * 1-5' # test every minute
+    - cron: '* * * * 1-5' # test every minute
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
@@ -133,7 +133,7 @@ jobs:
             const FAILED_RUN_URL = "${{ github.event.schedule }}";
             const COMMIT_SHA = "${{ github.sha }}";
 
-            console.log(context.event);
+            console.log(context);
 
             // notify slack of failure
             const { WebClient } = require('@slack/web-api');
