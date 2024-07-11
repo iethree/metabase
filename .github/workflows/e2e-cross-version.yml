@@ -2,7 +2,7 @@ name: E2E Cross-version Tests
 
 on:
   schedule:
-    - cron: '0/30 * * * 1-5' # test every minute
+    - cron: '0/5 * * * 1-5' # test schedule
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
@@ -130,10 +130,10 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: | # js
-            const FAILED_RUN_URL = "${{ github.event.schedule }}";
-            const COMMIT_SHA = "${{ github.sha }}";
+            const FAILED_RUN_URL = "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}";
+            const REF_NAME = "${{ github.ref_name }}".replace('refs/heads/', '');
 
-            console.log(context);
+            console.log(github);
 
             // notify slack of failure
             const { WebClient } = require('@slack/web-api');
@@ -147,7 +147,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": `:broken_heart:   Cross-version tests are failing`,
+                    "text": `:broken_heart:   Cross-version tests are failing on ${REF_NAME}`,
                     "emoji": true,
                   }
                 },
