@@ -1,3 +1,4 @@
+import type { Tag } from "./types";
 import {
   isValidVersionString,
   getOSSVersion,
@@ -13,6 +14,8 @@ import {
   getGenericVersion,
   getMilestoneName,
   findNextPatchVersion,
+  versionSort,
+  getLastReleaseFromTags,
 } from "./version-helpers";
 
 describe("version-helpers", () => {
@@ -490,6 +493,117 @@ describe("version-helpers", () => {
     it("should throw an error for RC versions", () => {
       expect(() => findNextPatchVersion("v0.75-RC2")).toThrow();
       expect(() => findNextPatchVersion("v1.75.0-RC1")).toThrow();
+    });
+  });
+
+  describe('getLatReleaseFromTags', () => {
+    it('should return the latest release tag for minor versions', () => {
+      const latest = getLastReleaseFromTags([
+        { ref: 'refs/tags/v0.12.0' },
+        { ref: 'refs/tags/v0.12.2' },
+        { ref: 'refs/tags/v0.12.1' },
+      ] as Tag[]);
+      expect(latest).toBe('v0.12.2');
+    });
+
+    it('should return the latest release tag for patch versions', () => {
+      const latest = getLastReleaseFromTags([
+        { ref: 'refs/tags/v0.12.0' },
+        { ref: 'refs/tags/v0.11.2' },
+        { ref: 'refs/tags/v0.12.2' },
+        { ref: 'refs/tags/v0.12.1' },
+        { ref: 'refs/tags/v0.12.2.0' },
+        { ref: 'refs/tags/v0.12.2.3' },
+        { ref: 'refs/tags/v0.12.2.2' },
+      ] as Tag[]);
+      expect(latest).toBe('v0.12.2.3');
+    });
+
+    it('should return the latest tag for major version', () => {
+      const latest = getLastReleaseFromTags([
+        { ref: 'refs/tags/v0.12.9' },
+        { ref: 'refs/tags/v0.12.8' },
+        { ref: 'refs/tags/v0.13.0' },
+      ] as Tag[]);
+      expect(latest).toBe('v0.13.0');
+    });
+
+    it('should ignore release candidates', () => {
+      const latest = getLastReleaseFromTags([
+        { ref: 'refs/tags/v0.12.0' },
+        { ref: 'refs/tags/v0.12.2-RC99' },
+        { ref: 'refs/tags/v0.12.1' },
+      ] as Tag[]);
+      expect(latest).toBe('v0.12.1');
+    });
+  });
+
+  describe('verisonSort', () => {
+    it('should sort major versions', () => {
+      const diff1 = versionSort('v0.50.9', 'v0.48.1');
+      expect(diff1).toBeGreaterThan(0);
+
+      const diff2 = versionSort('v0.40.9', 'v0.50.1');
+      expect(diff2).toBeLessThan(0);
+
+      const diff3 = versionSort('v0.50.0', 'v0.50.0');
+      expect(diff3).toBe(0);
+    });
+
+    it('should sort minor versions', () => {
+      const diff1 = versionSort('v0.48.10', 'v0.48.1');
+      expect(diff1).toBeGreaterThan(0);
+
+      const diff2 = versionSort('v0.40.2', 'v0.40.4');
+      expect(diff2).toBeLessThan(0);
+
+      const diff3 = versionSort('v0.50.11', 'v0.50.11');
+      expect(diff3).toBe(0);
+    });
+
+    it.each([
+      [["v0.50.9.2", "v0.50.9.1"], ["v0.50.9.1", "v0.50.9.2"]],
+      [["v0.50.9.2", "v0.50.9.2"], ["v0.50.9.2", "v0.50.9.2"]],
+      [["v0.50.9.1", "v0.50.9.2"], ["v0.50.9.1", "v0.50.9.2"]],
+      [["v0.50.9.1", "v0.50.9.0"], ["v0.50.9.0", "v0.50.9.1"]],
+      [["v0.50.9", "v0.50.9.0"], ["v0.50.9", "v0.50.9.0"]],
+      [["v0.50.9.1", "v0.50.9"], ["v0.50.9", "v0.50.9.1"]],
+      [["v0.50.9.3", "v0.50.1"], ["v0.50.1", "v0.50.9.3"]],
+      [["v0.50.1.23", "v0.50.2"], ["v0.50.1.23", "v0.50.2"]],
+      [["v0.51.0", "v0.50.22.99"], ["v0.50.22.99", "v0.51.0"]],
+      [["v0.52.2.2", "v0.52.1"], ["v0.52.1", "v0.52.2.2"]],
+      [["v0.52.2.23", "v0.52.2.13"], ["v0.52.2.13", "v0.52.2.23"]],
+    ])("%s sorts to %s", (input, expected) => {
+      const sorted = input.sort(versionSort);
+      expect(sorted).toEqual(expected);
+    });
+
+    it('should handle versions with or without Vs', () => {
+      const diff1 = versionSort('v0.48.10', 'v0.48.1');
+      expect(diff1).toBeGreaterThan(0);
+
+      const diff2 = versionSort('0.40.2', 'v0.40.4');
+      expect(diff2).toBeLessThan(0);
+
+      const diff3 = versionSort('v0.50.11', '0.50.11');
+      expect(diff3).toBe(0);
+
+      const diff4 = versionSort('0.50.12', '0.50.11');
+      expect(diff4).toBeGreaterThan(0);
+    });
+
+    it('should ignore the ee/oss prefix', () => {
+      const diff1 = versionSort('v0.48.10', 'v1.48.1');
+      expect(diff1).toBeGreaterThan(0);
+
+      const diff2 = versionSort('1.40.2', 'v0.40.4');
+      expect(diff2).toBeLessThan(0);
+
+      const diff3 = versionSort('v0.50.11', '1.50.11');
+      expect(diff3).toBe(0);
+
+      const diff4 = versionSort('50.12', '1.50.11');
+      expect(diff4).toBeGreaterThan(0);
     });
   });
 });

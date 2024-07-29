@@ -208,8 +208,9 @@ const normalizeVersionForSorting = (version: string) =>
   version.replace(/^(v?)(0|1)\./, '');
 
 export function versionSort(a: string, b: string) {
-  const [aMajor, aMinor] = normalizeVersionForSorting(a).split('.').map(Number);
-  const [bMajor, bMinor] = normalizeVersionForSorting(b).split('.').map(Number);
+  const [aMajor, aMinor, aPatch] = normalizeVersionForSorting(a).split('.').map(Number);
+  const [bMajor, bMinor, bPatch] = normalizeVersionForSorting(b).split('.').map(Number);
+
 
   if (aMajor !== bMajor) {
     return aMajor - bMajor;
@@ -217,6 +218,12 @@ export function versionSort(a: string, b: string) {
 
   if (aMinor !== bMinor) {
     return aMinor - bMinor;
+  }
+
+  console.log({ aPatch, bPatch });
+
+  if (aPatch !== bPatch) {
+    return (aPatch ?? 0) - (bPatch ?? 0);
   }
 
   return 0;
@@ -244,7 +251,7 @@ export async function getLastReleaseTag({
     owner,
     repo,
     ref: `tags/v0.${version ? getMajorVersion(version) : ''}`,
-  })
+  });
 
   const lastRelease = getLastReleaseFromTags(tags);
 

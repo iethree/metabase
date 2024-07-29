@@ -741,7 +741,7 @@ jobs:
 
   publish-complete-message:
     runs-on: ubuntu-22.04
-    needs: [draft-release-notes, verify-docker-pull, verify-s3-download, publish-version-info]
+    needs: [push-tags, verify-docker-pull, verify-s3-download, publish-version-info]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4

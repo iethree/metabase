@@ -1,8 +1,11 @@
 /* eslint-disable no-console */
 import type { GithubCheck, GithubProps, Issue, ReleaseProps } from "./types";
 import {
+  getLastReleaseFromTags,
+  getLastReleaseTag,
   getMilestoneName,
   getNextVersions,
+  getVersionFromReleaseBranch,
   isLatestVersion,
   isValidVersionString,
 } from "./version-helpers";
@@ -257,4 +260,29 @@ export async function getLatestGreenCommit({
   }
   console.log("No green commit found");
   return null;
+}
+
+export async function hasCommitBeenReleased({
+  github,
+  owner,
+  repo,
+  ref,
+  majorVersion,
+}: GithubProps & { ref: string, majorVersion: number }) {
+    const lastTag = await getLastReleaseTag({
+      github, owner, repo,
+      version: `v0.${majorVersion}.0`,
+    });
+
+    const tagDetail = await github.rest.git.getRef({
+      owner,
+      repo,
+      ref: `tags/${lastTag}`,
+    });
+
+    const lastTagSha = tagDetail.data.object.sha;
+
+    console.log({ lastTag, lastTagSha, ref });
+
+    return lastTagSha === ref;
 }
