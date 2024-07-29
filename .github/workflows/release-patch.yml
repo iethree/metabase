@@ -6,13 +6,13 @@ on:
     inputs:
       version:
         description: 'Major Metabase version (e.g. 45, 52, 68)'
-        type: string
+        type: number
         required: true
   schedule:
     - cron: '0 7 * * 1-5' # every weekday at 8am/9am Central European Time
 
 jobs:
-  start-message:
+  auto-patch-trigger:
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
@@ -20,8 +20,8 @@ jobs:
         with:
           sparse-checkout: release
       - name: Prepare build scripts
-        run: cd ${{ github.workspace }}/release && yarn && yarn build
-      - name: Send build start message
+        run: yarn --cwd release --frozen-lockfile && yarn --cwd release build
+      - name: Trigger auto-patch
         uses: actions/github-script@v7
         with:
           script: | # js
@@ -38,14 +38,14 @@ jobs:
                 github,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                majorVersion: CURRENT_VERSION,
+                majorVersion,
               });
 
               const goodCommit = await getLatestGreenCommit({
                 github,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                branch: `release-x.${CURRENT_VERSION}.x`,
+                branch: `release-x.${majorVersion}.x`,
               });
 
               if (nextPatch && goodCommit) {
@@ -62,17 +62,18 @@ jobs:
                 });
               } else {
                 console.log(
-                  'No new patch version or no green commit found',
                   { nextPatch, goodCommit }
                 );
+                throw new Error(`No new patch version or no green commit found for v${majorVersion}`);
               }
             }
 
             if (context.eventName === 'workflow_dispatch') {
-              const inputVersion = Number('${{ inputs.version }}');
+              const inputVersion = Number(context.payload.inputs.version);
 
-              if (typeof version !== 'number') {
-                throw new Error('Invalid version number', '${{ inputs.version }}');
+              if (typeof inputVersion !== 'number') {
+                console.log('Invalid version number', inputVersion);
+                throw new Error(`Invalid version number: ${inputVersion}`);
               }
 
               await releasePatchFor(inputVersion);

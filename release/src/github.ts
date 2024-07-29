@@ -227,7 +227,7 @@ export async function getChecksForRef({
   return checks;
 }
 
-export async function getLastGreenCommit({
+export async function getLatestGreenCommit({
   github,
   owner,
   repo,
