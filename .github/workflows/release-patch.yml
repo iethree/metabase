@@ -36,15 +36,15 @@ jobs:
             async function releasePatchFor(majorVersion) {
               const nextPatch = await getNextPatchVersion({
                 github,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner: 'metabase', // FIXME context.repo.owner,
+                repo: 'metabase', // FIXME context.repo.repo,
                 majorVersion,
               });
 
               const goodCommit = await getLatestGreenCommit({
                 github,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner: 'metabase', // FIXME context.repo.owner,
+                repo: 'metabase', // FIXME context.repo.repo,
                 branch: `release-x.${majorVersion}.x`,
               });
 
