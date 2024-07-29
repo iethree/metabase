@@ -42,7 +42,7 @@ jobs:
               version: '${{ inputs.version }}',
               runId: '${{ github.run_id }}',
               releaseSha: '${{ inputs.commit }}',
-              userName: '${{ inputs.auto }}' === 'true' ? 'schedule' : '${{ github.actor }}',
+              userName: '${{ github.actor }}',
               channelName: '${{ vars.SLACK_RELEASE_CHANNEL }}',
             }).catch(console.error);
 
