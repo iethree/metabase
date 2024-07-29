@@ -250,3 +250,32 @@ export async function getLastReleaseTag({
 
   return lastRelease;
 }
+
+export const findNextPatchVersion = (version: string) => {
+  if (!isValidVersionString(version) || isRCVersion(version)) {
+    throw new Error(`Invalid version string: ${version}`);
+  }
+
+  const [major, minor, patch] = version
+    .replace(/(v1|v0)\./, "")
+    .split(".")
+    .map(Number);
+
+  return `v0.${major}.${minor ?? 0}.${(patch ?? 0) + 1}`;
+}
+
+export const getNextPatchVersion = async ({
+  github,
+  owner,
+  repo,
+  majorVersion,
+}: GithubProps & { majorVersion: number }) => {
+  const lastRelease = await getLastReleaseTag({
+    github, owner, repo,
+    version: `v0.${majorVersion.toString()}.0`
+  });
+
+  const nextPatch = findNextPatchVersion(lastRelease);
+
+  return nextPatch;
+}

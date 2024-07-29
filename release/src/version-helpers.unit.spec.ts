@@ -12,6 +12,7 @@ import {
   getNextVersions,
   getGenericVersion,
   getMilestoneName,
+  findNextPatchVersion,
 } from "./version-helpers";
 
 describe("version-helpers", () => {
@@ -454,17 +455,41 @@ describe("version-helpers", () => {
       });
     });
   });
-});
+  describe("getMilestoneName", () => {
+    it.each([
+      ["v0.50.0", "0.50"],
+      ["v1.50.0", "0.50"],
+      ["v1.50.0-rc1", "0.50"],
+      ["v1.50.0-RC1", "0.50"],
+      ["v0.50.1", "0.50.1"],
+      ["v1.50.1", "0.50.1"],
+    ])("%s -> %s", (input, expected) => {
+      expect(getMilestoneName(input)).toBe(expected);
+    });
+  });
 
-describe("getMilestoneName", () => {
-  it.each([
-    ["v0.50.0", "0.50"],
-    ["v1.50.0", "0.50"],
-    ["v1.50.0-rc1", "0.50"],
-    ["v1.50.0-RC1", "0.50"],
-    ["v0.50.1", "0.50.1"],
-    ["v1.50.1", "0.50.1"],
-  ])("%s -> %s", (input, expected) => {
-    expect(getMilestoneName(input)).toBe(expected);
+  describe('findNextPatchVersion', () => {
+    it.each([
+      ["v1.50.0", "v0.50.0.1"],
+      ["v1.23.0", "v0.23.0.1"],
+      ["v1.33.0.0", "v0.33.0.1"],
+      ["v1.33.0.1", "v0.33.0.2"],
+      ["v0.50.1", "v0.50.1.1"],
+      ["v1.50.1.2", "v0.50.1.3"],
+      ["v1.50.9.21", "v0.50.9.22"],
+      ["v1.50.9.99", "v0.50.9.100"],
+    ])("%s -> %s", (input, expected) => {
+      expect(findNextPatchVersion(input)).toBe(expected);
+    });
+
+    it("should throw an error for invalid versions", () => {
+      expect(() => findNextPatchVersion("foo")).toThrow();
+      expect(() => findNextPatchVersion("v2.75")).toThrow();
+    });
+
+    it("should throw an error for RC versions", () => {
+      expect(() => findNextPatchVersion("v0.75-RC2")).toThrow();
+      expect(() => findNextPatchVersion("v1.75.0-RC1")).toThrow();
+    });
   });
 });
