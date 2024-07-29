@@ -325,7 +325,7 @@ export async function sendPublishCompleteMessage({
   repo,
 }: {
   channelName: string,
-  generalChannelName: string,
+  generalChannelName?: string,
   version: string,
   runId: number,
   owner: string,
@@ -340,8 +340,10 @@ export async function sendPublishCompleteMessage({
   const buildThread = await getExistingSlackMessage(version, channelName);
   await sendSlackReply({ channelName, message, messageId: buildThread?.id, broadcast: true });
 
-  await sendSlackMessage({
-    message: `:partydeploy: *Metabase ${getGenericVersion(version)} has been released!* :partydeploy:\n\nSee the ${slackLink('full release notes here', `https://github.com/${owner}/${repo}/releases`)}.`,
-    channelName: generalChannelName,
-  });
+  if (generalChannelName) {
+    await sendSlackMessage({
+      message: `:partydeploy: *Metabase ${getGenericVersion(version)} has been released!* :partydeploy:\n\nSee the ${slackLink('full release notes here', `https://github.com/${owner}/${repo}/releases`)}.`,
+      channelName: generalChannelName,
+    });
+  }
 }
