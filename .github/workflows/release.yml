@@ -262,11 +262,11 @@ jobs:
     - name: Upload to s3 latest path
       if: ${{ !inputs.auto && steps.latest_path.outputs.result != 'false' }}
       run: aws s3 cp ./metabase.jar s3://${{ vars.AWS_S3_DOWNLOADS_BUCKET }}/${{ steps.latest_path.outputs.result }}/metabase.jar
-    - name: Create cloudfront invalidation
-      run: |
-        aws cloudfront create-invalidation \
-        --distribution-id ${{ vars.AWS_CLOUDFRONT_DOWNLOADS_ID }} \
-        --paths /${{ steps.version_path.outputs.result }}/metabase.jar
+    # - name: Create cloudfront invalidation
+    #   run: |
+    #     aws cloudfront create-invalidation \
+    #     --distribution-id ${{ vars.AWS_CLOUDFRONT_DOWNLOADS_ID }} \
+    #     --paths /${{ steps.version_path.outputs.result }}/metabase.jar
 
 
   verify-s3-download:
@@ -514,7 +514,7 @@ jobs:
         $GITHUB_WORKSPACE/release/reorder-tags.sh ${{ needs.check-version.outputs.ee }} ${{ inputs.commit }}
 
   trigger-docs-update:
-    if: ${{ !inputs.auto && inputs.skip-release-notes != true }}
+    if: false # FIXME
     needs:
       - push-tags
       - check-version
@@ -586,7 +586,7 @@ jobs:
             --assignee "jeff-bruemmer"
 
   trigger-cloud-issues:
-    if: ${{ !inputs.auto }}
+    if: false
     needs: push-tags
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -608,6 +608,7 @@ jobs:
             });
 
   trigger-ee-extra-pr:
+    if: false
     needs: verify-s3-download
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -734,11 +735,11 @@ jobs:
         else
           aws s3 cp version-info.json s3://${{ vars.AWS_S3_STATIC_BUCKET }}/version-info.json
         fi
-    - name: Create cloudfront invalidation for version-info.json and version-info-ee.json
-      run: |
-        aws cloudfront create-invalidation \
-        --distribution-id ${{ vars.AWS_CLOUDFRONT_STATIC_ID }} \
-        --paths "/version-info.json" "/version-info-ee.json"
+    # - name: Create cloudfront invalidation for version-info.json and version-info-ee.json
+    #   run: |
+    #     aws cloudfront create-invalidation \
+    #     --distribution-id ${{ vars.AWS_CLOUDFRONT_STATIC_ID }} \
+    #     --paths "/version-info.json" "/version-info-ee.json"
 
   publish-complete-message:
     if: ${{ !inputs.auto }}
