@@ -60,9 +60,11 @@ export const generateVersionInfoJson = ({
 export const updateVersionInfoLatestJson = ({
   newLatestVersion,
   existingVersionInfo,
+  rollout,
 }: {
   newLatestVersion: string;
   existingVersionInfo: VersionInfoFile;
+  rollout: number;
 }) => {
   if (existingVersionInfo.latest.version === newLatestVersion) {
     console.warn(`Version ${newLatestVersion} already latest`);
@@ -82,8 +84,13 @@ export const updateVersionInfoLatestJson = ({
     (info: VersionInfo) => info.version !== newLatestVersion,
   );
 
+  oldLatestVersionInfo.rollout = undefined;
+
   return {
-    latest: newLatestVersionInfo,
+    latest: {
+      ...newLatestVersionInfo,
+      rollout,
+    },
     older: [oldLatestVersionInfo, ...newOldVersionInfo],
   };
 };
@@ -125,8 +132,10 @@ export async function getVersionInfo({
 // for updating the latest version in version info
 export const updateVersionInfoLatest = async ({
   newLatestVersion,
+  rollout = 100,
 }: {
   newLatestVersion: string;
+  rollout?: number;
 }) => {
   const url = getVersionInfoUrl(newLatestVersion);
   const existingFile = (await fetch(url).then(r =>
@@ -136,6 +145,7 @@ export const updateVersionInfoLatest = async ({
   const newVersionJson = updateVersionInfoLatestJson({
     newLatestVersion,
     existingVersionInfo: existingFile,
+    rollout,
   });
 
   return newVersionJson;
