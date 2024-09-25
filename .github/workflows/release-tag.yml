@@ -274,7 +274,7 @@ jobs:
     needs: check-version
     uses: ./.github/workflows/release-log.yml
     with:
-      version: ${{ toJson(vars.CURRENT_VERSION) }}
+      version: ${{ fromJSON(vars.CURRENT_VERSION) }} # cast string to number
     secrets: inherit
 
   update-version-info:
