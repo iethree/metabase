@@ -31,5 +31,5 @@ jobs:
             github,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            channelName: 'engineering-ci'
+            channelName: 'bot-testing'
           });
