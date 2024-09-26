@@ -196,7 +196,9 @@ export function updateVersionInfoChannelJson({
       version,
       released: new Date().toISOString().slice(0, 10),
       rollout,
-      highlights: [],
+      highlights: [
+        `TEST CODE: This release is now available on the ${channel} channel`,
+      ],
     },
   };
 }
