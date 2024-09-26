@@ -317,7 +317,7 @@ jobs:
       with:
         result-encoding: string
         script: | # js
-          const { updateVersionInfoLatest } = require('${{ github.workspace }}/release/dist/index.cjs');
+          const { updateVersionInfoChannel } = require('${{ github.workspace }}/release/dist/index.cjs');
           const fs = require('fs');
 
           const edition = '${{ matrix.edition }}';
