@@ -191,11 +191,11 @@ jobs:
           s3://${{ vars.AWS_S3_DOWNLOADS_BUCKET }}/${{ steps.source_path.outputs.result }}/metabase.jar \
           s3://${{ vars.AWS_S3_DOWNLOADS_BUCKET }}/${{ steps.upload_path.outputs.result }}/metabase.jar
 
-    - name: Create cloudfront invalidation
-      run: |
-        aws cloudfront create-invalidation \
-        --distribution-id ${{ vars.AWS_CLOUDFRONT_DOWNLOADS_ID }} \
-        --paths /${{ steps.upload_path.outputs.result }}/metabase.jar
+    # - name: Create cloudfront invalidation
+    #   run: |
+    #     aws cloudfront create-invalidation \
+    #     --distribution-id ${{ vars.AWS_CLOUDFRONT_DOWNLOADS_ID }} \
+    #     --paths /${{ steps.upload_path.outputs.result }}/metabase.jar
 
     - name: Download the jars
       run: | # sh
