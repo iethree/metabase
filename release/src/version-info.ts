@@ -4,10 +4,10 @@ import _ from "underscore";
 import { getMilestoneIssues } from "./github";
 import type {
   Issue,
+  ReleaseChannel,
   ReleaseProps,
   VersionInfo,
   VersionInfoFile,
-  ReleaseChannel,
 } from "./types";
 import {
   getVersionType,
@@ -102,6 +102,7 @@ export const updateVersionInfoLatestJson = ({
   oldLatestVersionInfo.rollout = undefined;
 
   return {
+    ...existingVersionInfo,
     latest: {
       ...newLatestVersionInfo,
       rollout,
@@ -180,6 +181,7 @@ export function updateVersionInfoChannelJson({
   version: string;
   rollout?: number;
 }): VersionInfoFile {
+
   if (channel === "latest") {
     // tagging latest requires moving the current latest to the "older" array
     return updateVersionInfoLatestJson({
@@ -196,9 +198,7 @@ export function updateVersionInfoChannelJson({
       version,
       released: new Date().toISOString().slice(0, 10),
       rollout,
-      highlights: [
-        `TEST CODE: This release is now available on the ${channel} channel`,
-      ],
+      highlights: [],
     },
   };
 }
