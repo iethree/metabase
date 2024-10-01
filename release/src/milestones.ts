@@ -2,6 +2,7 @@ import fs from "fs";
 
 import { graphql } from "@octokit/graphql";
 import _ from "underscore";
+import { $ } from "zx";
 
 import { hiddenLabels, nonUserFacingLabels } from "./constants";
 import {
@@ -49,6 +50,18 @@ function getExcludedLabels(issue: Issue) {
 
 function shouldExcludeIssueFromMilestone(issue: Issue) {
   return !!getExcludedLabels(issue).length;
+}
+
+export async function getReleaseBranchCommits(
+  { versionNumber }: { versionNumber: number }
+) {
+  const lastMajorVersion = versionNumber - 1;
+
+  // find where the last branch split off of master
+  const { stdout: branchCommit } = await $`git merge-base origin/release-x.${lastMajorVersion}.x master`;
+  const { stdout: commitMessages } = await $`git log ${branchCommit.trim()}..origin/release-x.${versionNumber}.x --pretty='format:%s'`;
+
+  return commitMessages.split('\n')
 }
 
 async function getIssuesWithExcludedTags({
@@ -149,7 +162,7 @@ async function getOriginalIssues({
   return [issue.number];
 }
 
-async function setMilestone({ github, owner, repo, issueNumber, milestone }: GithubProps & { issueNumber: number, milestone: Milestone }) {
+async function setMilestone({ github, owner, repo, issueNumber, milestone, ignoreExistingMilestones }: GithubProps & { issueNumber: number, milestone: Milestone, ignoreExistingMilestones?: boolean }) {
   // we can use this for both issues and PRs since they're the same for many purposes in github
   const issue = await getIssueWithCache({
     github,
@@ -159,12 +172,19 @@ async function setMilestone({ github, owner, repo, issueNumber, milestone }: Git
   });
 
   if (!issue?.milestone) {
-    return github.rest.issues.update({
-      owner,
-      repo,
-      issue_number: issueNumber,
-      milestone: milestone.number,
-    });
+    console.log(`Setting milestone on issue ${issueNumber} to ${milestone.title}`);
+    // FIXME test code
+    // return github.rest.issues.update({
+    //   owner,
+    //   repo,
+    //   issue_number: issueNumber,
+    //   milestone: milestone.number,
+    // });
+    return;
+  }
+
+  if (ignoreExistingMilestones) {
+    return;
   }
 
   const existingMilestone = issue.milestone;
@@ -223,7 +243,8 @@ export async function setMilestoneForCommits({
   repo,
   branchName,
   commitMessages,
-}: GithubProps & { commitMessages: string[], branchName: string}) {
+  ignoreExistingMilestones,
+}: GithubProps & { commitMessages: string[], branchName: string, ignoreExistingMilestones?: boolean }) {
   // figure out milestone
   const branchVersion = getVersionFromReleaseBranch(branchName);
   const majorVersion = getMajorVersion(branchVersion);
@@ -264,7 +285,7 @@ export async function setMilestoneForCommits({
   console.log(`Tagging ${uniqueIssuesToTag.length} issues with milestone ${nextMilestone.title}`)
 
   for (const issueNumber of uniqueIssuesToTag) { // for loop to avoid rate limiting
-    await setMilestone({ github, owner, repo, issueNumber, milestone: nextMilestone });
+    await setMilestone({ github, owner, repo, issueNumber, milestone: nextMilestone, ignoreExistingMilestones });
   }
 }
 
