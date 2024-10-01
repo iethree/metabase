@@ -1,5 +1,5 @@
 name: Automatically set milestone
-run-name: Set milestone for ${{ github.event.head_commit.message }}
+run-name: Set milestone for ${{ github.event.head_commit.message || inputs.version }}
 
 on:
   push:
