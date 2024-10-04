@@ -425,11 +425,14 @@ jobs:
       uses: actions/github-script@v7
       with:
         result-encoding: string
+        # FIXME: there's a perms problem in my fork
+        github-token: ${{ secrets.METABASE_AUTOMATION_USER_TOKEN }}
         script: | # js
           const { tagRelease } = require('${{ github.workspace }}/release/dist/index.cjs');
 
           const OSSversion = '${{ needs.check-version.outputs.oss }}';
           const EEversion = '${{ needs.check-version.outputs.ee }}';
+
 
           // push EE tag
           await tagRelease({
