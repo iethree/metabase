@@ -43,12 +43,16 @@ jobs:
                 majorVersion,
               });
 
-              const goodCommit = await getLatestGreenCommit({
-                github,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                branch: `release-x.${majorVersion}.x`,
-              });
+              // FIXME for testing
+              // const goodCommit = await getLatestGreenCommit({
+              //   github,
+              //   owner: context.repo.owner,
+              //   repo: context.repo.repo,
+              //   branch: `release-x.${majorVersion}.x`,
+              // });
+
+              // FIXME for testing
+              const goodCommit = '1b59f0dbe4e24bbdda6ce1ad8ddb67d34a5682eb';
 
               const hasBeenReleased = await hasCommitBeenReleased({
                 github,
