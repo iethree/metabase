@@ -473,7 +473,7 @@ jobs:
         $GITHUB_WORKSPACE/release/reorder-tags.sh ${{ needs.check-version.outputs.ee }} ${{ inputs.commit }}
 
   trigger-docs-update:
-    if: ${{ !inputs.auto && inputs.skip-release-notes != true }}
+    if: false # FIXME ${{ !inputs.auto && inputs.skip-release-notes != true }}
     needs:
       - push-tags
       - check-version
