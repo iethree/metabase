@@ -279,7 +279,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # fetch all history
+        fetch-tags: true
     - name: Add and push git tag
       run: | # sh
 
