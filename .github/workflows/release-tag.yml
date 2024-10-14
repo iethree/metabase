@@ -279,6 +279,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
+        fetch-depth: 0 # we want all branches and tags
         fetch-tags: true
     - name: Add and push git tag
       run: | # sh
