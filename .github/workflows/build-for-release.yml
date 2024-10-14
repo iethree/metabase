@@ -262,5 +262,7 @@ jobs:
               inputs: {
                 commit: '${{ inputs.commit }}',
                 version: '${{ inputs.version }}',
+                'release-channel': "${{ inputs.release_channel || 'none'}}",
+                auto: '${{ inputs.auto }}' == 'true',
               }
             });

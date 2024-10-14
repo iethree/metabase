@@ -184,6 +184,8 @@ jobs:
                 inputs: {
                   commit: '${{ inputs.commit }}',
                   version: '${{ inputs.version }}',
+                  'release-channel': releaseChannel,
+                  auto: '${{ inputs.auto }}',
                 }
               });
             }
