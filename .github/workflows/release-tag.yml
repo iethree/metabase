@@ -139,6 +139,7 @@ jobs:
 
   copy-to-s3:
     runs-on: ubuntu-22.04
+    needs: check-version
     timeout-minutes: 5
     strategy:
       matrix:
