@@ -55,6 +55,12 @@ on:
         default: true
 
 jobs:
+  green-check-stub:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 2
+    steps:
+    - name: Stub
+      run: echo "Stub to make this job successful even if all the rest of the steps are skipped"
   check-version:
     # skips everything if the tag_name is 'none' because all later jobs depend on this job
     if: ${{ inputs.tag_name != 'none' }}
