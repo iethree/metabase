@@ -118,7 +118,6 @@ jobs:
       uses: actions/github-script@v7
       id: release_branch
       with:
-        result_encoding: string
         script: | # js
           const { getReleaseBranch } = require('${{ github.workspace }}/release/dist/index.cjs');
           const version = '${{ inputs.version }}';
@@ -253,5 +252,6 @@ jobs:
                 commit: '${{ inputs.commit }}',
                 version: '${{ inputs.version }}',
                 auto: '${{ inputs.auto }}',
+                'release-channel': '${{ inputs.release-channel || 0 }}' || 'none', // invisible, can only be triggered programatically
               }
             });

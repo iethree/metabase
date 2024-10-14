@@ -309,6 +309,7 @@ jobs:
               inputs: {
                 commit: '${{ inputs.commit }}',
                 version: '${{ inputs.version }}',
+                'release-channel': "${{ inputs.release-channel || 'none' }}"
                 auto: true,
               }
             });
