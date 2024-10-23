@@ -21,26 +21,6 @@ on:
           - nightly
         required: true
         default: 'none'
-      skip-docker:
-        description: 'Skip Docker image publishing'
-        type: boolean
-        default: false
-      skip-s3:
-        description: 'Skip S3 artifact publishing'
-        type: boolean
-        default: false
-      skip-version-info:
-        description: 'Skip publishing version-info.json'
-        type: boolean
-        default: false
-      skip-tag:
-        description: 'Skip tagging the release'
-        type: boolean
-        default: false
-      skip-release-notes:
-        description: 'Skip publishing release notes'
-        type: boolean
-        default: false
       auto:
         description: 'auto-patch release DO NOT SET MANUALLY'
         type: boolean
