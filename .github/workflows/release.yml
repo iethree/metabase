@@ -448,7 +448,7 @@ jobs:
         $GITHUB_WORKSPACE/release/reorder-tags.sh ${{ needs.check-version.outputs.ee }} ${{ inputs.commit }}
 
   trigger-docs-update:
-    if: ${{ !inputs.auto }}
+    if: false # FIXME FOR TESTING ${{ !inputs.auto }}
     needs:
       - push-tags
       - check-version
@@ -542,6 +542,7 @@ jobs:
             });
 
   trigger-ee-extra-pr:
+    if: false # FIXME FOR TESTING
     needs: verify-s3-download
     runs-on: ubuntu-22.04
     timeout-minutes: 10
