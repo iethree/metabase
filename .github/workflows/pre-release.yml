@@ -12,10 +12,6 @@ on:
         description: "A full-length commit SHA-1 hash"
         type: string
         required: true
-      auto:
-        description: 'auto-patch release DO NOT SET MANUALLY'
-        type: boolean
-        default: false
   workflow_call:
     inputs:
       version:
@@ -26,10 +22,6 @@ on:
         description: "A full-length commit SHA-1 hash"
         type: string
         required: true
-      auto:
-        description: 'auto-patch release DO NOT SET MANUALLY'
-        type: boolean
-        default: false
 
 jobs:
   release-artifact:
