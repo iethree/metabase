@@ -182,7 +182,6 @@ jobs:
           ./version.properties
 
   upload-to-s3:
-    if: ${{ inputs.skip-s3 != true }}
     runs-on: ubuntu-22.04
     needs: download-uberjar
     timeout-minutes: 15
@@ -232,7 +231,6 @@ jobs:
 
 
   verify-s3-download:
-    if: ${{ inputs.skip-s3 != true }}
     runs-on: ubuntu-22.04
     needs: upload-to-s3
     timeout-minutes: 15
@@ -266,7 +264,6 @@ jobs:
       run: grep -q $(sha256sum ./metabase-downloaded.jar) SHA256.sum && echo "checksums match" || exit 1
 
   containerize:
-    if: ${{ inputs.skip-docker != true }}
     runs-on: ubuntu-22.04
     needs: [check-version, download-uberjar]
     timeout-minutes: 15
@@ -300,6 +297,34 @@ jobs:
           console.log("The canonical version of this Metabase", edition, "edition is", canonical_version);
 
           return canonical_version;
+    - uses: actions/download-artifact@v4
+      name: Retrieve previously downloaded Uberjar
+      with:
+        name: metabase-${{ matrix.edition }}-uberjar
+    - name: Move the Uberjar to the context dir
+      run: mv ./metabase.jar bin/docker/.
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v2
+      with:
+        driver-opts: network=host
+    - name: Build ${{ matrix.edition }} container
+      uses: docker/build-push-action@v3
+      with:
+        context: bin/docker/.
+        platforms: linux/amd64
+        network: host
+        tags: localhost:5000/local-metabase:${{ steps.canonical_version.outputs.result }}
+        no-cache: true
+        push: true
+
+    - name: Launch container
+      run: docker run --rm -dp 3000:3000 localhost:5000/local-metabase:${{ steps.canonical_version.outputs.result }}
+      timeout-minutes: 5
+    - name: Wait for Metabase to start
+      run: while ! curl -s 'http://localhost:3000/api/health' | grep '{"status":"ok"}'; do sleep 1; done
+      timeout-minutes: 3
+
     - name: Determine the target Docker Hub repository
       run: |
         if [[ "${{ matrix.edition }}" == "ee" ]]; then
@@ -309,34 +334,20 @@ jobs:
           echo "Metabase OSS: image is going to be pushed to ${{ github.repository_owner }}/metabase"
           echo "DOCKERHUB_REPO=${{ github.repository_owner }}/metabase" >> $GITHUB_ENV
         fi
-    - uses: actions/download-artifact@v4
-      name: Retrieve previously downloaded Uberjar
-      with:
-        name: metabase-${{ matrix.edition }}-uberjar
-    - name: Move the Uberjar to the context dir
-      run: mv ./metabase.jar bin/docker/.
+
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_RELEASE_USERNAME }}
         password: ${{ secrets.DOCKERHUB_RELEASE_TOKEN }}
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Build ${{ matrix.edition }} container
-      uses: docker/build-push-action@v6
-      with:
-        context: bin/docker/.
-        platforms: linux/amd64,linux/arm64
-        network: host
-        tags: ${{ env.DOCKERHUB_REPO }}:${{ steps.canonical_version.outputs.result }}
-        no-cache: true
-        push: true
+    - name: Retag and push container image to Docker Hub
+      run: |
+        echo "Pushing ${{ steps.canonical_version.outputs.result }} to ${{ env.DOCKERHUB_REPO }} ..."
+        docker tag localhost:5000/local-metabase:${{ steps.canonical_version.outputs.result }} ${{ env.DOCKERHUB_REPO }}:${{ steps.canonical_version.outputs.result }}
+        docker push ${{ env.DOCKERHUB_REPO }}:${{ steps.canonical_version.outputs.result }}
+        echo "Finished!"
 
   verify-docker-pull:
-    if: ${{ inputs.skip-docker != true }}
     runs-on: ubuntu-22.04
     needs: containerize
     timeout-minutes: 15
@@ -385,7 +396,6 @@ jobs:
       timeout-minutes: 3
 
   push-tags:
-    if: ${{ inputs.skip-tag != true }}
     permissions: write-all
     needs: [verify-s3-download, verify-docker-pull, check-version]
     runs-on: ubuntu-22.04
@@ -438,7 +448,7 @@ jobs:
         $GITHUB_WORKSPACE/release/reorder-tags.sh ${{ needs.check-version.outputs.ee }} ${{ inputs.commit }}
 
   trigger-docs-update:
-    if: false # FIXME ${{ !inputs.auto && inputs.skip-release-notes != true }}
+    if: ${{ !inputs.auto }}
     needs:
       - push-tags
       - check-version
@@ -532,7 +542,6 @@ jobs:
             });
 
   trigger-ee-extra-pr:
-    if: false # FIXME FOR TESTING
     needs: verify-s3-download
     runs-on: ubuntu-22.04
     timeout-minutes: 10
@@ -555,7 +564,7 @@ jobs:
             });
 
   draft-release-notes:
-    if: ${{ !inputs.auto && inputs.skip-release-notes != true }}
+    if: ${{ !inputs.auto }}
     needs: push-tags
     runs-on: ubuntu-22.04
     timeout-minutes: 15
@@ -607,7 +616,6 @@ jobs:
             });
 
   publish-version-info:
-    if: ${{ !inputs.auto && inputs.skip-version-info != true }}
     runs-on: ubuntu-22.04
     needs: [push-tags, check-version]
     timeout-minutes: 15
@@ -618,6 +626,11 @@ jobs:
       AWS_S3_STATIC_BUCKET: ${{ vars.AWS_S3_STATIC_BUCKET }}
       AWS_REGION: ${{ vars.AWS_REGION }}
     steps:
+    - name: Finish early
+      if: ${{ inputs.auto }}
+      run: |
+        echo "skipping version info update for nightly patch"
+        exit 0
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -666,7 +679,7 @@ jobs:
         --paths "/version-info.json" "/version-info-ee.json"
 
   set-release-channel:
-    needs: [push-tags, verify-docker-pull, verify-s3-download, publish-version-info]
+    needs: publish-version-info
     uses: ./.github/workflows/release-tag.yml
     secrets: inherit
     with:
