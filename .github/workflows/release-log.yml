@@ -4,7 +4,7 @@ run-name: Update Release Log ${{ inputs.version }}
 on:
   push:
     tags:
-      - v*
+      - v1.* # only update for EE so we don't double update
     branches:
       - release-x.*
   workflow_dispatch:
