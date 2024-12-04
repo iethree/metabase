@@ -3,6 +3,8 @@ run-name: Update Release Log ${{ inputs.version }}
 
 on:
   push:
+    tags:
+      - v*
     branches:
       - release-x.*
   workflow_dispatch:
@@ -35,6 +37,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
       - uses: actions/checkout@v4
         with:
+          ref: refs/heads/master
           fetch-depth: 0 # we want all branches and tags
       - name: Install Dependencies
         run: yarn --cwd release --frozen-lockfile && npm i -g tsx
