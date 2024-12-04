@@ -50,8 +50,10 @@ jobs:
               getMajorVersion,
             } = require('${{ github.workspace }}/release/dist/index.cjs');
 
+            console.log(context);
+
             const version = getVersionFromReleaseBranch({
-              branch: context.ref,
+              branch: context.ref_name,
             });
 
             const majorVersion = getMajorVersion(version);
