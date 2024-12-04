@@ -1,5 +1,5 @@
 name: Update Release Log
-run-name: Update Release Log ${{ inputs.version }}
+run-name: Update Release Log ${{ inputs.version || github.ref_name }}
 
 on:
   push:
