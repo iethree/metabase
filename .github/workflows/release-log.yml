@@ -55,16 +55,18 @@ jobs:
               return;
             }
 
+            const branch = context.payload.ref;
+
             // otherwise, get the version from the release branch name
             const version = getVersionFromReleaseBranch({
-              branch: context.ref,
+              branch: branch,
             });
 
-            console.log({ version, ref: context.ref });
+            console.log({ version, branch });
 
             const majorVersion = getMajorVersion(version);
 
-            console.log({ ref: context.ref, version, majorVersion });
+            console.log({ branch, version, majorVersion });
 
             core.exportVariable('VERSION', majorVersion);
 
