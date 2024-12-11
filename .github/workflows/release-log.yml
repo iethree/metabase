@@ -58,9 +58,7 @@ jobs:
             const branch = context.payload.ref;
 
             // otherwise, get the version from the release branch name
-            const version = getVersionFromReleaseBranch({
-              branch: branch,
-            });
+            const version = getVersionFromReleaseBranch(branch);
 
             console.log({ version, branch });
 
