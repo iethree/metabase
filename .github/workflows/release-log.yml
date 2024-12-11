@@ -50,7 +50,7 @@ jobs:
             console.log({ context });
 
             // if the version is explicitly set, use that
-            if (context.payload.inputs.version) {
+            if (context.payload?.inputs?.version) {
               core.exportVariable('VERSION', context.payload.inputs.version);
               return;
             }
