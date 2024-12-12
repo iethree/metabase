@@ -455,7 +455,7 @@ jobs:
 
 
   trigger-docs-update:
-    if: ${{ !inputs.auto }}
+    if: ${{ !inputs.auto && github.repository == 'metabase/metabase' }}
     needs:
       - push-tags
       - check-version
@@ -549,6 +549,7 @@ jobs:
             });
 
   trigger-ee-extra-pr:
+    if: ${{ github.repository == 'metabase/metabase' }}
     needs: verify-s3-download
     runs-on: ubuntu-22.04
     timeout-minutes: 10
