@@ -88,21 +88,14 @@ jobs:
             oss: getCanonicalVersion(version, 'oss'),
           };
 
-          const ossReleased = await hasBeenReleased({
+          const released = await hasBeenReleased({
             github,
             owner: context.repo.owner,
             repo: context.repo.repo,
             version: versions.oss,
           });
 
-          const eeReleased = await hasBeenReleased({
-            github,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            version: versions.ee,
-          });
-
-          if (ossReleased || eeReleased) {
+          if (released) {
             throw new Error("This version has already been released!", version);
           }
 
@@ -614,7 +607,7 @@ jobs:
 
   draft-release-notes:
     if: ${{ !inputs.auto }}
-    needs: push-tags
+    needs: add-extra-tags
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     permissions: write-all
@@ -725,7 +718,7 @@ jobs:
 
   publish-complete-message:
     runs-on: ubuntu-22.04
-    needs: set-release-channel
+    needs: [set-release-channel, add-extra-tags]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
