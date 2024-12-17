@@ -446,12 +446,8 @@ jobs:
             process.exit(1);
           });
 
-
   get-extra-tags:
-    needs:
-      - push-tags
-      - verify-docker-pull
-      - verify-s3-download
+    needs: [ check-version ]
     runs-on: ubuntu-22.04
     outputs:
       extra_tags: ${{ steps.taglist.outputs.extra_tags }}
@@ -477,7 +473,11 @@ jobs:
             core.setOutput('extra_tags', JSON.stringify(extra_tags));
 
   add-extra-tags:
-    needs: get-extra-tags
+    needs:
+      - get-extra-tags
+      - push-tags
+      - verify-docker-pull
+      - verify-s3-download
     strategy:
       matrix:
         tag: ${{ fromJson(needs.get-extra-tags.outputs.extra_tags) }}
