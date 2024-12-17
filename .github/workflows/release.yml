@@ -486,6 +486,9 @@ jobs:
     with:
       version: ${{ inputs.version }}
       tag_name: ${{ matrix.tag }}
+      tag_ee: ${{ contains(matrix.tag, 'v1') }}
+      tag_oss: ${{ contains(matrix.tag, 'v0' ) }}
+      update-version-info: false
 
 
   trigger-docs-update:
@@ -776,11 +779,11 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             version,
-          });
+          }).catch(console.error);
 
           await openNextMilestones({
             github,
             owner: context.repo.owner,
             repo: context.repo.repo,
             version,
-          });
+          }).catch(console.error);
