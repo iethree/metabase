@@ -277,17 +277,21 @@ jobs:
       with:
         fetch-depth: 0 # we want all branches and tags
         fetch-tags: true
-    - name: Add and push git tag
+    - name: Add and push git tag for nightly/beta/latest
+      if: ${{ inputs.update-version-info }}
       run: | # sh
-
         if [[ "${{ matrix.edition }}" == "ee" ]]; then
-          # FIXME this is all wrong
           git tag -f ${{ inputs.tag_name }}-ee ${{ needs.check-version.outputs.oss }}
           git push origin -f ${{ inputs.tag_name }}-ee
         elif [[ "${{ matrix.edition }}" == "oss" ]]; then
           git tag -f ${{ inputs.tag_name }}-oss ${{ needs.check-version.outputs.oss }}
           git push origin -f ${{ inputs.tag_name }}-oss
         fi
+    - name: Add and push git tag for dot X tags
+      if: ${{ !inputs.update-version-info }}
+      run: | # sh
+        git tag -f ${{ inputs.tag_name }} ${{ needs.check-version.outputs.oss }}
+        git push origin -f ${{ inputs.tag_name }}
 
   update-version-info:
     runs-on: ubuntu-22.04
