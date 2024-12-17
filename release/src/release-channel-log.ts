@@ -34,7 +34,10 @@ export async function gitLog(channel: ReleaseChannel, edition: Edition): Promise
 
 function processCommit(commitLine: string, edition: Edition): CommitInfo {
   const [refs, message, hash, date] = commitLine.split('||');
-  const version = refs?.match(/(v(0|1)\.[\d\.x\-(RC|beta|alpha)]+)/i)?.[1] ?? '';
+
+  // match version strings that don't have an x in them
+  // https://regexr.com/8a5kb
+  const version = refs?.match(/(v(0|1)\.[\d\.\-(RC|beta|alpha)]+)(?!.*x)/i)?.[1] ?? '';
 
   return { version, message, hash, date};
 }
