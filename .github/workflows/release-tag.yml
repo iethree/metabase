@@ -53,9 +53,9 @@ on:
         description: Apply to OSS
         type: boolean
         default: true
-      update-version-info:
+      dot-x-tag:
         type: boolean
-        default: true
+        default: false
 
 jobs:
   green-check-stub:
@@ -278,7 +278,7 @@ jobs:
         fetch-depth: 0 # we want all branches and tags
         fetch-tags: true
     - name: Add and push git tag for nightly/beta/latest
-      if: ${{ inputs.update-version-info }}
+      if: ${{ !inputs.dot-x-tag }}
       run: | # sh
         if [[ "${{ matrix.edition }}" == "ee" ]]; then
           git tag -f ${{ inputs.tag_name }}-ee ${{ needs.check-version.outputs.oss }}
@@ -288,12 +288,13 @@ jobs:
           git push origin -f ${{ inputs.tag_name }}-oss
         fi
     - name: Add and push git tag for dot X tags
-      if: ${{ !inputs.update-version-info }}
+      if: ${{ inputs.dot-x-tag }}
       run: | # sh
         git tag -f ${{ inputs.tag_name }} ${{ needs.check-version.outputs.oss }}
         git push origin -f ${{ inputs.tag_name }}
 
   update-version-info:
+    if: ${{ !inputs.dot-x-tag }}
     runs-on: ubuntu-22.04
     needs: check-version
     timeout-minutes: 5
