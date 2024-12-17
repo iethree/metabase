@@ -290,7 +290,6 @@ jobs:
         fi
 
   update-version-info:
-    if: ${{ needs.check-version.outputs.update_version_info == 'true' }}
     runs-on: ubuntu-22.04
     needs: check-version
     timeout-minutes: 5
