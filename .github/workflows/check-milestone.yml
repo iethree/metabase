@@ -2,9 +2,6 @@ name: Automatically set milestone
 run-name: Set milestone for ${{ github.event.head_commit.message || inputs.version }}
 
 on:
-  push:
-    branches:
-      - release-x.**
   workflow_dispatch:
     inputs:
       version:

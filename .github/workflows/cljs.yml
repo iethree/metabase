@@ -1,10 +1,6 @@
 name: CLJS
 
 on:
-  push:
-    branches:
-      - 'master'
-      - 'release-**'
   pull_request:
 
 concurrency:

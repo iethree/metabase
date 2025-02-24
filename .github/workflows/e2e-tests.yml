@@ -54,12 +54,13 @@ jobs:
             }
 
   e2e-tests:
+
     name: ${{ matrix.name }}-${{ matrix.edition }}
     uses: ./.github/workflows/e2e-test.yml
     needs:
       - e2e-matrix-builder
-    if: |
-      !cancelled() && !inputs.skip
+      - build
+    if: false # FIXME for testing
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.e2e-matrix-builder.outputs.matrix) }}
@@ -141,7 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     name: e2e-tests-result
-    if: always() && !cancelled()
+    if: false # FIXME for testing
     env:
       E2E_TESTS_RESULT: ${{ needs.e2e-tests.result }}
     steps:

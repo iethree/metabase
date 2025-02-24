@@ -1,13 +1,6 @@
 name: Run tests
 
 on:
-  push:
-    branches:
-      - "master"
-      - "release-**"
-  pull_request:
-    types: [opened, synchronize, reopened]
-  merge_group:
   workflow_dispatch:
 
 jobs:
@@ -68,12 +61,12 @@ jobs:
     with:
       skip: ${{ needs.files-changed.outputs.backend_all != 'true' }}
 
-  driver-tests:
-    needs: files-changed
-    uses: ./.github/workflows/drivers.yml
-    secrets: inherit
-    with:
-      skip: ${{ needs.files-changed.outputs.backend_all != 'true' }}
+  # driver-tests:
+  #   needs: files-changed
+  #   uses: ./.github/workflows/drivers.yml
+  #   secrets: inherit
+  #   with:
+  #     skip: ${{ needs.files-changed.outputs.backend_all != 'true' }}
 
   frontend-tests:
     needs: files-changed

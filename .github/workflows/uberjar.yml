@@ -8,20 +8,6 @@ concurrency:
   cancel-in-progress: false
 
 on:
-  push:
-    branches:
-      - master
-      - internal-tools
-    paths-ignore:
-      # config files
-      - ".**"
-      # documentation
-      - "docs/**"
-      - "**.md"
-      # this covers both BE and FE unit tests, as well as E2E tests
-      - "**test/**"
-      - "**_test.clj"
-      - "**/frontend/**.unit.*"
   workflow_dispatch:
     inputs:
       commit:
