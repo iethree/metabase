@@ -1,17 +1,6 @@
 name: "Snyk"
 
 on:
-  push:
-    branches:
-      - 'master'
-      - 'release-**'
-    paths:
-      - '**/deps.edn'
-      - '**/package.json'
-      - '.github/workflows/snyk.yml'
-      - '.github/scripts/write-poms.sh'
-  schedule:
-    - cron: '0 5 * * *'
 
 
 jobs:

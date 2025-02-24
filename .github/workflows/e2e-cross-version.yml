@@ -1,8 +1,6 @@
 name: E2E Cross-version Tests
 
 on:
-  schedule:
-    - cron: '0 9 * * 1-5'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
