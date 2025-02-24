@@ -1,15 +1,7 @@
 name: E2E Embedding SDK Compatibility tests
 
 on:
-  push:
-    branches:
-      - "master"
-      - "release-**"
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - "master"
-      - "release-**"
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref && github.ref || github.run_id }}
