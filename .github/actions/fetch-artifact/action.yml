@@ -48,7 +48,7 @@ runs:
         if [ -e "metabase.jar" ]; then
           echo "metabase.jar is already in the right place"
         elif [ -e "target/uberjar/metabase.jar" ]; then
-          echo "moving metabase.jar to current directory"
+            echo "moving metabase.jar to current directory"
           mv target/uberjar/metabase.jar metabase.jar
         else
           echo "Could not find the metabase.jar file"
@@ -57,7 +57,7 @@ runs:
 
     - name: Verify that this is a valid JAR file
       shell: sh
-      run: file --mime-type metabase.jar
+      run: file --mime-type ./metabase.jar
     - name: Reveal its version.properties
       shell: sh
       run: jar xf metabase.jar version.properties && cat version.properties

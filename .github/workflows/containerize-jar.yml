@@ -19,10 +19,10 @@ on:
         description: usually something like "metabase-release-{{ edition }}-{{ hash }}-uberjar"
         type: string
       repo:
-        description: owner and repo like "metabase/metabase"
+        description: docker owner and repo like "metabase/metabase"
         type: string
       tag:
-        description: usually a version like 1.87.2
+        description: usually a version like v1.87.2
         type: string
       commit:
         description: the full commit hash
@@ -71,7 +71,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: bin/docker/.
-        platforms: steps.platforms.outputs.result
+        platforms: ${{ steps.platforms.outputs.result }}
         network: host
         tags: ${{ inputs.repo }}:${{ inputs.tag }}
         no-cache: true
