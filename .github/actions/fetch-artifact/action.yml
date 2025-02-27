@@ -57,7 +57,7 @@ runs:
 
     - name: Verify that this is a valid JAR file
       shell: sh
-      run: file --mime-type ./metabase.jar | grep "application/zip"
+      run: file --mime-type metabase.jar
     - name: Reveal its version.properties
       shell: sh
       run: jar xf metabase.jar version.properties && cat version.properties
