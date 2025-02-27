@@ -43,21 +43,21 @@ runs:
       shell: bash
       run: unzip mb.zip
     - name: Move the Uberjar
-      shell: bash
+      shell: sh
       run: | # bash
         if [ -e "metabase.jar" ]; then
-            echo "metabase.jar is already in the right place"
+          echo "metabase.jar is already in the right place"
         elif [ -e "target/uberjar/metabase.jar" ]; then
-            # Move the file to the destination directory
-            mv target/uberjar/metabase.jar metabase.jar
+          echo "moving metabase.jar to current directory"
+          mv target/uberjar/metabase.jar metabase.jar
         else
-            echo "Could not find the metabase.jar file"
-            exit 1
+          echo "Could not find the metabase.jar file"
+          exit 1
         fi
 
     - name: Verify that this is a valid JAR file
-      shell: bash
+      shell: sh
       run: file --mime-type ./metabase.jar | grep "application/zip"
     - name: Reveal its version.properties
-      shell: bash
+      shell: sh
       run: jar xf metabase.jar version.properties && cat version.properties
