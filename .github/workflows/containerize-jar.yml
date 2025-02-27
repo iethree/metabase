@@ -62,9 +62,12 @@ jobs:
       with:
         result-encoding: string
         script: | # js
-          const version = "${{ inputs.tag }}";
-          const { getBuildRequirements } = require('${{ github.workspace }}/release/dist/index.cjs');
+          const { getBuildRequirements, isValidVersionString} = require('${{ github.workspace }}/release/dist/index.cjs');
+          const version = "${{ inputs.tag }}".split('-')[0];
 
+          if (!isValidVersionString(version)) {
+            return "linux/amd64";
+          }
           // versions before 53 need to be handled differently
           const buildInfo = getBuildRequirements(version);
           return buildInfo.platforms;
