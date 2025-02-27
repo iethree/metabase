@@ -36,6 +36,8 @@ jobs:
       platforms: ${{ steps.platforms.outputs.result }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
       # we want the dockerfile from the commit we're building
     - run: git checkout ${{ inputs.commit }} -- bin/docker
     - name: Retrieve test build uberjar artifact
