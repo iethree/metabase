@@ -56,8 +56,8 @@ runs:
         fi
 
     - name: Verify that this is a valid JAR file
-      shell: sh
+      shell: bash
       run: file --mime-type ./metabase.jar
     - name: Reveal its version.properties
-      shell: sh
+      shell: bash
       run: jar xf metabase.jar version.properties && cat version.properties
