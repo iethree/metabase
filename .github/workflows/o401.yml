@@ -29,7 +29,9 @@ jobs:
             const body = `
               <details>
                 <summary>${setup}</summary>
-                ${punchline}
+
+
+                ${punchline} 🤣
               </details>
             `;
 
