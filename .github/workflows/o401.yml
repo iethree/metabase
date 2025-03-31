@@ -12,12 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - run: npm i -g node-fetch
       - uses: actions/script@v7
         with:
           script: | # js
-            const fetch = require('node-fetch');
-
             const content = await fetch('https://infopanel.org/info/data/jokes.php')
               .then(res => res.json())
               .catch(console.error);
