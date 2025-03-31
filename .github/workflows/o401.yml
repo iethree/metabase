@@ -19,20 +19,22 @@ jobs:
               .then(res => res.json())
               .catch(console.error);
 
+            if (!content) {
+              console.error('Failed to fetch content');
+              return;
+            }
+
             const { setup, punchline } = content;
 
-            const body = `\n\n
-            <details>
-              <summary>${setup}</summary>
-              ${punchline}
-            </details>
+            const body = `
+              <details>
+                <summary>${setup}</summary>
+                ${punchline}
+              </details>
             `;
 
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+            await github.rest.issues.createComment({
+              ...context.repo,
               issue_number: context.payload.pull_request.number,
               body,
             }).catch(console.error);
-
-
