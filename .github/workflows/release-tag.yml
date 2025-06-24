@@ -250,9 +250,9 @@ jobs:
 
     - name: Tag the docker image
       run: | # sh
-        docker buildx imagetools create --tag
-          \ $DOCKERHUB_REPO\:$DOCKERHUB_VERSION
-          \ $DOCKERHUB_REPO\:$TAG_NAME
+        docker buildx imagetools create --tag \
+          $DOCKERHUB_REPO\:$DOCKERHUB_VERSION \
+          $DOCKERHUB_REPO\:$TAG_NAME
 
   push-git-tags:
     permissions: write-all
