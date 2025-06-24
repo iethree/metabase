@@ -251,7 +251,7 @@ jobs:
     - name: Tag the docker image
       run: | # sh
         docker buildx imagetools create --tag \
-          $DOCKERHUB_REPO\:$TAG_NAME / # to
+          $DOCKERHUB_REPO\:$TAG_NAME \ # to
           $DOCKERHUB_REPO\:$DOCKERHUB_VERSION # from
 
   push-git-tags:
