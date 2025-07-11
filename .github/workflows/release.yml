@@ -481,16 +481,16 @@ jobs:
             // website changelog
             const changelogText = getWebsiteChangelog({ version, issues });
 
-            await github.rest.repos.createDispatchEvent({
-              owner: context.repo.owner,
-              repo: '${{ vars.WEBSITE_REPO }}',
-              event_type: 'update-changelog',
-              client_payload: {
-                version: getGenericVersion(version),
-                majorVersion: getMajorVersion(version),
-                text: changelogText,
-              }
-            }).catch(console.warn);
+            // await github.rest.repos.createDispatchEvent({
+            //   owner: context.repo.owner,
+            //   repo: '${{ vars.WEBSITE_REPO }}',
+            //   event_type: 'update-changelog',
+            //   client_payload: {
+            //     version: getGenericVersion(version),
+            //     majorVersion: getMajorVersion(version),
+            //     text: changelogText,
+            //   }
+            // }).catch(console.warn);
 
   publish-version-info:
     runs-on: ubuntu-22.04
