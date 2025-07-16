@@ -67,28 +67,28 @@ jobs:
         exit 1
     - uses: actions/checkout@v4
       with:
-        sparse-checkout: release
-    - name: Prepare build scripts
-      run: cd ${{ github.workspace }}/release && yarn && yarn build
-    - name: Get Release Version
-      uses: actions/github-script@v7
+        sparse-checkout: |
+          .github
+          release
+    - uses: ./.github/actions/run-release-code
       id: canonical_version
+      env:
+        GH_TOKEN: ${{ secrets.METABASE_AUTOMATION_USER_TOKEN }}
       with:
+        name: Get Release Version
         script: | # js
-          const { isValidVersionString, getCanonicalVersion, hasBeenReleased } = require('${{ github.workspace }}/release/dist/index.cjs');
-
           const version = '${{ inputs.version }}';
 
-          if (!isValidVersionString(version)) {
+          if (!R.isValidVersionString(version)) {
             throw new Error("The version format is invalid! It must start with either 'v0.' or 'v1.'.");
           }
 
           const versions = {
-            ee: getCanonicalVersion(version, 'ee'),
-            oss: getCanonicalVersion(version, 'oss'),
+            ee: R.getCanonicalVersion(version, 'ee'),
+            oss: R.getCanonicalVersion(version, 'oss'),
           };
 
-          const released = await hasBeenReleased({
+          const released = await R.hasBeenReleased({
             github,
             owner: context.repo.owner,
             repo: context.repo.repo,

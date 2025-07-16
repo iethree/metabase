@@ -1,0 +1,35 @@
+name: Run release code
+description: Run code from the release package
+
+inputs:
+  name:
+    description: step name
+    default: Run release code
+  script:
+    description: javascript code to run, you can use R for all release functions
+    required: true
+
+outputs:
+  result:
+    description: result of the script execution
+    value: ${{ steps.run_release_code.outputs.result }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare build scripts
+      shell: bash
+      run: | # bash
+       if [ ! -f "${{ github.workspace }}/release/dist/index.cjs" ]; then
+         echo "Release code not found, running build"
+         cd ${{ github.workspace }}/release && yarn && yarn build
+        else
+          echo "Release code found, skipping build"
+        fi
+    - name: ${{ inputs.name }}
+      uses: actions/github-script@v7
+      with:
+        script: | # js
+          const R = require('${{ github.workspace }}/release/dist/index.cjs');
+
+          ${{ inputs.script }}
