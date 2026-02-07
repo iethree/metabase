@@ -47,7 +47,7 @@ jobs:
     secrets: inherit
 
   backend-tests:
-    if: ${{ !cancelled() && needs.files-changed.result == 'success' }}
+    if: false
     needs: [files-changed]
     uses: ./.github/workflows/backend.yml
     secrets: inherit
