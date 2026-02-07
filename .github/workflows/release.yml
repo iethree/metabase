@@ -112,7 +112,7 @@ jobs:
         with:
           sparse-checkout: |
             .github
-            releasee
+            release
       - name: Prepare release scripts
         uses: ./.github/actions/prepare-release-scripts
       - name: Send publish start message
