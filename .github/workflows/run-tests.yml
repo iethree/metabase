@@ -88,9 +88,8 @@ jobs:
       skip-lint: ${{ needs.files-changed.outputs.frontend_all != 'true' && needs.files-changed.outputs.e2e_specs != 'true' }}
 
   e2e-tests:
-    if: false
     needs: [files-changed, uberjar]
-    if: always() && !cancelled() && needs.files-changed.result == 'success'
+    if: false
     uses: ./.github/workflows/e2e-tests.yml
     secrets: inherit
     with:
@@ -103,13 +102,7 @@ jobs:
 
   embedding-sdk-package:
     needs: [files-changed]
-    if: |
-      false &&
-      !cancelled() &&
-      (needs.files-changed.outputs.embedding_sdk_components == 'true' ||
-      needs.files-changed.outputs.frontend_sources == 'true' ||
-      needs.files-changed.outputs.embedding_documentation == 'true' ||
-      needs.files-changed.outputs.embedding_sdk_ci == 'true')
+    if: false
     uses: ./.github/workflows/embedding-sdk-package-build.yml
     secrets: inherit
 
@@ -128,12 +121,7 @@ jobs:
 
   pr-env:
     needs: [uberjar]
-    if: |
-      false &&
-      !cancelled() &&
-      contains(github.event.pull_request.labels.*.name, 'PR-Env') &&
-      !contains(github.event.pull_request.labels.*.name, 'PR-Env-self-hosting') &&
-      !contains(github.event.pull_request.labels.*.name, 'PR-Env-analytics-dev')
+    if: false
     uses: ./.github/workflows/pr-env.yml
     secrets: inherit
     with:
