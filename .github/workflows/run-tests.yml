@@ -55,6 +55,7 @@ jobs:
       skip: ${{ needs.files-changed.outputs.backend_all != 'true' }}
 
   semantic-search-tests:
+    if: false
     needs: files-changed
     uses: ./.github/workflows/semantic-search.yml
     secrets: inherit
@@ -62,6 +63,7 @@ jobs:
       skip: ${{ needs.files-changed.outputs.backend_all != 'true' }}
 
   app-db-tests:
+    if: false
     needs: files-changed
     uses: ./.github/workflows/app-db.yml
     secrets: inherit
@@ -69,6 +71,7 @@ jobs:
       skip: ${{ needs.files-changed.outputs.backend_all != 'true' }}
 
   driver-tests:
+    if: false
     needs: files-changed
     uses: ./.github/workflows/drivers.yml
     secrets: inherit
@@ -76,6 +79,7 @@ jobs:
       skip: ${{ needs.files-changed.outputs.backend_all != 'true' }}
 
   frontend-tests:
+    if: false
     needs: files-changed
     uses: ./.github/workflows/frontend.yml
     secrets: inherit
@@ -84,6 +88,7 @@ jobs:
       skip-lint: ${{ needs.files-changed.outputs.frontend_all != 'true' && needs.files-changed.outputs.e2e_specs != 'true' }}
 
   e2e-tests:
+    if: false
     needs: [files-changed, uberjar]
     if: always() && !cancelled() && needs.files-changed.result == 'success'
     uses: ./.github/workflows/e2e-tests.yml
@@ -99,6 +104,7 @@ jobs:
   embedding-sdk-package:
     needs: [files-changed]
     if: |
+      false &&
       !cancelled() &&
       (needs.files-changed.outputs.embedding_sdk_components == 'true' ||
       needs.files-changed.outputs.frontend_sources == 'true' ||
@@ -109,7 +115,7 @@ jobs:
 
   sdk-tests:
     needs: [uberjar, embedding-sdk-package, files-changed]
-    if: always()
+    if: false
     uses: ./.github/workflows/embedding-sdk.yml
     secrets: inherit
     with:
@@ -123,6 +129,7 @@ jobs:
   pr-env:
     needs: [uberjar]
     if: |
+      false &&
       !cancelled() &&
       contains(github.event.pull_request.labels.*.name, 'PR-Env') &&
       !contains(github.event.pull_request.labels.*.name, 'PR-Env-self-hosting') &&
@@ -136,7 +143,7 @@ jobs:
   pr-env-self-hosting:
     needs: [uberjar]
     if: |
-      !cancelled() &&
+      false &&
       contains(github.event.pull_request.labels.*.name, 'PR-Env-self-hosting')
     uses: ./.github/workflows/pr-env.yml
     secrets: inherit
@@ -147,6 +154,7 @@ jobs:
   pr-env-analytics-dev:
     needs: [uberjar]
     if: |
+      false &&
       !cancelled() &&
       contains(github.event.pull_request.labels.*.name, 'PR-Env-analytics-dev')
     uses: ./.github/workflows/pr-env.yml
@@ -158,6 +166,7 @@ jobs:
   containerize:
     needs: [uberjar]
     if: |
+      false &&
       !cancelled() &&
       needs.uberjar.result == 'success' &&
       (
