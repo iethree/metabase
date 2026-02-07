@@ -33,7 +33,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: release
+          sparse-checkout: |
+            .github
+            release
       - name: Prepare release scripts
         uses: ./.github/actions/prepare-release-scripts
       # note: this block can be removed after we stop needing to be able to test versions before v55
@@ -251,7 +253,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: release
+          sparse-checkout: |
+            .github
+            release
       - name: Prepare release scripts
         uses: ./.github/actions/prepare-release-scripts
       - name: Send tests complete message
